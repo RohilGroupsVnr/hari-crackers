@@ -1472,7 +1472,8 @@
                 <span class="badge" id="productBadge">0</span>
             </a>
 
-            <div class="nav-label" style="margin-top:20px;">Direct Billing</div>
+            <div class="nav-label" style="margin-top:20px;">Direct
+                Billing</div>
 
             <a href="billing.html" class="nav-item">
                 <i class="fas fa-cog"></i> Billing
@@ -1527,7 +1528,8 @@
             <div id="lowStockBanner" class="low-stock-banner">
                 <div class="banner-title">
                     <i class="fas fa-triangle-exclamation"></i>
-                    <span id="lowStockBannerText">Stock குறைவா இருக்கு</span>
+                    <span id="lowStockBannerText">Stock குறைவா
+                        இருக்கு</span>
                 </div>
                 <div class="low-stock-list" id="lowStockList"></div>
             </div>
@@ -1748,7 +1750,7 @@
             deleteObject
         } from "firebase/storage";
 
-        
+
         const firebaseConfig = {
             apiKey: "AIzaSyBZrDsCAoEEQYmjj9lcmC6Jo6WHZ96zuz8",
             authDomain: "hari-crackers.firebaseapp.com",
@@ -1787,26 +1789,26 @@
         // ============================================================
         // DEFAULT CATEGORIES
         // ============================================================
-     const defaultCategories = [
-    "ONE SOUND CRACKERS",
-    "FLOWER POTS (PANDIYAN, JOKER, NEW EVEREST)",
-    "GROUND CHAKKAR (PANDIYAN, JOKER, JENIS)",
-    "BIJILI & WALA",
-    "ATOM BOMB'S",
-    "TWINKLING STAR",
-    "MATCH BOX COMB",
-    "CHILDREN'S SPECIAL",
-    "PENCIL SPECIAL",
-    "NEW SPECIAL FOUNTAINS [RAVIKANNAN, MOTHERS, VADIVEL]",
-    "NEW WONDERS / RASTKALA WOW STAR",
-    "RAINBOW POP FANCY [VADIVEL, PANDIYAN, ORIENT]",
-    "VOLCANO BLAST [PANDIYAN, RAJKALA, SURYAKALA]",
-    "MULTI COLOUR SHOT [RAVIKANNAN, RHINO, LIYA]",
-    "2026 NEW ELITE FANCY",
-    "MONSTER BEAST COMB [RASKALA, LIYA, SONNY]",
-    "CARNIVAL DISPLAY SETOUT [SONNY, LIYA, PANDIYAN]",
-    "SPARKLERS"
-];
+        const defaultCategories = [
+            "ONE SOUND CRACKERS",
+            "FLOWER POTS (PANDIYAN, JOKER, NEW EVEREST)",
+            "GROUND CHAKKAR (PANDIYAN, JOKER, JENIS)",
+            "BIJILI & WALA",
+            "ATOM BOMB'S",
+            "TWINKLING STAR",
+            "MATCH BOX COMB",
+            "CHILDREN'S SPECIAL",
+            "PENCIL SPECIAL",
+            "NEW SPECIAL FOUNTAINS [RAVIKANNAN, MOTHERS, VADIVEL]",
+            "NEW WONDERS / RAJKALA WOW STAR",
+            "RAINBOW POP FANCY [VADIVEL, PANDIYAN, ORIENT]",
+            "VOLCANO BLAST [PANDIYAN, RAJKALA, SURYAKALA]",
+            "MULTI COLOUR SHOT [RAVIKANNAN, RHINO, LIYA]",
+            "2026 NEW ELITE FANCY",
+            "MONSTER BEAST COMB [RAJKALA, LIYA, SONNY]",
+            "CARNIVAL DISPLAY SETOUT [SONNY, LIYA, PANDIYAN]",
+            "SPARKLERS"
+        ];
         // ============================================================
         // CATEGORY MANAGEMENT
         // ============================================================
@@ -1934,35 +1936,35 @@
                 console.error('Error listening to orders:', error);
             });
         }
-// ============================================================
-// LISTEN TO STOCK ALERTS — Sidebar badge count (Low Stock Products)
-// ============================================================
-function listenToStockAlerts() {
-    const productsRef = collection(db, 'products');
-    
-    onSnapshot(productsRef, (snapshot) => {
-        let lowStockCount = 0;
-        
-        snapshot.docs.forEach(doc => {
-            const data = doc.data();
-            const stockQty = data.stockQty;
-            const threshold = data.lowStockThreshold || 5;
-            
-            // Stock track pannirundha + threshold-ku kuraiya irundha count pannum
-            if (typeof stockQty === 'number' && stockQty <= threshold) {
-                lowStockCount++;
-            }
-        });
-        
-        const badge = document.getElementById('stockAlertBadge');
-        if (badge) {
-            badge.textContent = lowStockCount;
-            badge.style.display = lowStockCount > 0 ? 'inline-block' : 'none';
+        // ============================================================
+        // LISTEN TO STOCK ALERTS — Sidebar badge count (Low Stock Products)
+        // ============================================================
+        function listenToStockAlerts() {
+            const productsRef = collection(db, 'products');
+
+            onSnapshot(productsRef, (snapshot) => {
+                let lowStockCount = 0;
+
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const stockQty = data.stockQty;
+                    const threshold = data.lowStockThreshold || 5;
+
+                    // Stock track pannirundha + threshold-ku kuraiya irundha count pannum
+                    if (typeof stockQty === 'number' && stockQty <= threshold) {
+                        lowStockCount++;
+                    }
+                });
+
+                const badge = document.getElementById('stockAlertBadge');
+                if (badge) {
+                    badge.textContent = lowStockCount;
+                    badge.style.display = lowStockCount > 0 ? 'inline-block' : 'none';
+                }
+            }, (error) => {
+                console.error('Stock alert badge error:', error);
+            });
         }
-    }, (error) => {
-        console.error('Stock alert badge error:', error);
-    });
-}
 
         // ============================================================
         // LISTEN TO PRODUCTS (REAL-TIME SYNC)

@@ -637,7 +637,7 @@
 
         <div class="page-content">
 
-            <div class="summary-cards">
+            <div class="summary-cards" style="grid-template-columns: repeat(5, 1fr);">
                 <div class="summary-card">
                     <div class="sc-label">Total Bills</div>
                     <div class="sc-value" id="scCount">0</div>
@@ -651,10 +651,17 @@
                     <div class="sc-value" id="scWalkin">0</div>
                 </div>
                 <div class="summary-card">
-                    <div class="sc-label">Today's Sales</div>
+                    <div class="sc-label">Today's Total Sales</div>
                     <div class="sc-value" id="scToday">₹0</div>
                 </div>
+
+                <!-- ✅ NEW CARD: Today's Walk-in Revenue -->
+                <div class="summary-card" style="background: #fffdf5; border-color: #ffc107;">
+                    <div class="sc-label" style="color: #b8860b;">Today's Walk-in Revenue</div>
+                    <div class="sc-value" id="scTodayWalkin" style="color: #b8860b;">₹0</div>
+                </div>
             </div>
+
 
             <div class="panel">
                 <div class="filters-bar">
@@ -769,17 +776,40 @@
         }
 
         function renderSummary() {
+            // 1. Total Sales (Ella bills sethu)
             const totalSales = allBills.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+
+            // 2. Walk-in Bills Count
             const walkinBills = allBills.filter(b => b.source === 'walk-in');
+
+            // Today check
             const todayStr = new Date().toDateString();
+
+            // 3. Today's Total Sales (Website + Walk-in)
             const todaySales = allBills
                 .filter(b => b.orderDate && new Date(b.orderDate).toDateString() === todayStr)
                 .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
 
+            // 4. ✅ Today's Walk-in (Offline) Revenue
+            const todayWalkinRevenue = allBills
+                .filter(b =>
+                    b.orderDate &&
+                    new Date(b.orderDate).toDateString() === todayStr && // Check Today
+                    b.source === 'walk-in' // Check Walk-in (Offline)
+                )
+                .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+
+            // Update the UI
             document.getElementById('scCount').textContent = allBills.length;
             document.getElementById('scSales').textContent = '₹' + totalSales.toLocaleString('en-IN');
             document.getElementById('scWalkin').textContent = walkinBills.length;
             document.getElementById('scToday').textContent = '₹' + todaySales.toLocaleString('en-IN');
+
+            // ✅ Update the new 5th card (Today's Walk-in Revenue)
+            const walkinEl = document.getElementById('scTodayWalkin');
+            if (walkinEl) {
+                walkinEl.textContent = '₹' + todayWalkinRevenue.toLocaleString('en-IN');
+            }
         }
 
         function getFilteredBills() {

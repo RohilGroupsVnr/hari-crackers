@@ -783,9 +783,10 @@
                 <span class="badge" id="productBadge">0</span>
             </a>
 
-            <div class="nav-label" style="margin-top:20px;">Direct Billing</div>
+            <div class="nav-label" style="margin-top:20px;">Direct
+                Billing</div>
 
-                     <a href="billing.html" class="nav-item"><i class="fas fa-cash-register"></i> Billing</a>
+            <a href="billing.html" class="nav-item"><i class="fas fa-cash-register"></i> Billing</a>
 
             <a href="bills-history.html" class="nav-item">
                 <i class="fas fa-file-invoice"></i> Billing History
@@ -832,48 +833,68 @@
 
         <!-- PAGE CONTENT -->
         <div class="page-content">
-            <!-- STATS -->
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
-                    <div class="stat-number" id="totalOrders">0</div>
-                    <div class="stat-label">Total Orders</div>
-                    <span class="stat-change up"><i class="fas fa-arrow-up"></i> <span
-                            id="totalOrdersChange">0</span>%</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                    <div class="stat-number" id="pendingOrders">0</div>
-                    <div class="stat-label">Pending Orders</div>
-                    <span class="stat-change down"><i class="fas fa-arrow-down"></i> <span
-                            id="pendingOrdersChange">0</span>%</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-                    <div class="stat-number" id="completedOrders">0</div>
-                    <div class="stat-label">Completed</div>
-                    <span class="stat-change up"><i class="fas fa-arrow-up"></i> <span
-                            id="completedOrdersChange">0</span>%</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-box"></i></div>
-                    <div class="stat-number" id="totalProducts">0</div>
-                    <div class="stat-label">Total Products</div>
-                    <span class="stat-change up"><i class="fas fa-arrow-up"></i> <span
-                            id="totalProductsChange">0</span>%</span>
-                </div>
-            </div>
+      <!-- STATS -->
+<div class="stats-grid" id="statsGrid" style="grid-template-columns: repeat(5, 1fr); gap: 15px;">
+    
+    <!-- 1. Total Orders -->
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+        <div class="stat-number" id="totalOrders">0</div>
+        <div class="stat-label">Total Orders</div>
+        <span class="stat-change up"><i class="fas fa-arrow-up"></i> <span id="totalOrdersChange">0</span>%</span>
+    </div>
+
+    <!-- 2. Pending Orders -->
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+        <div class="stat-number" id="pendingOrders">0</div>
+        <div class="stat-label">Pending Orders</div>
+        <span class="stat-change down"><i class="fas fa-arrow-down"></i> <span id="pendingOrdersChange">0</span>%</span>
+    </div>
+
+    <!-- 3. Completed Orders -->
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-number" id="completedOrders">0</div>
+        <div class="stat-label">Completed</div>
+        <span class="stat-change up"><i class="fas fa-arrow-up"></i> <span id="completedOrdersChange">0</span>%</span>
+    </div>
+
+    <!-- 4. Total Products -->
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-box"></i></div>
+        <div class="stat-number" id="totalProducts">0</div>
+        <div class="stat-label">Total Products</div>
+        <span class="stat-change up"><i class="fas fa-arrow-up"></i> <span id="totalProductsChange">0</span>%</span>
+    </div>
+
+    <!-- 5. Today's Offline Billing -->
+    <div class="stat-card" style="border-top: 3px solid #ffc107;">
+        <div class="stat-icon" style="background: rgba(255, 193, 7, 0.15); color: #cc9900;">
+            <i class="fas fa-cash-register"></i>
+        </div>
+        <div class="stat-number" id="todayOfflineBills">0</div>
+        <div class="stat-label">Today's Offline Bills</div>
+        <!-- Revenue Display -->
+        <span class="stat-change up" style="color: #1e8b4c; background: rgba(46, 204, 113, 0.15); font-weight: bold; font-size: 0.8rem; margin-top: 8px;">
+            <i class="fas fa-rupee-sign"></i> <span id="todayOfflineRevenue">0</span> Revenue
+        </span>
+    </div>
+
+</div>
 
             <!-- RECENT ORDERS -->
             <div class="section-card">
                 <div class="section-header">
-                    <h3><i class="fas fa-list" style="color:var(--yellow);margin-right:8px;"></i> Recent Orders</h3>
+                    <h3><i class="fas fa-list" style="color:var(--yellow);margin-right:8px;"></i>
+                        Recent Orders</h3>
                     <a href="orders.html" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="table-wrap">
                     <div id="ordersLoading" class="loading-spinner">
                         <i class="fas fa-spinner"></i>
-                        <span style="margin-left:10px;">Loading orders...</span>
+                        <span style="margin-left:10px;">Loading
+                            orders...</span>
                     </div>
                     <table class="admin-table" id="ordersTable" style="display:none;">
                         <thead>
@@ -891,7 +912,8 @@
                     </table>
                     <div id="noOrders" class="no-data" style="display:none;">
                         <i class="fas fa-shopping-bag" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-                        No orders yet. Orders will appear here when customers place them.
+                        No orders yet. Orders will appear here when
+                        customers place them.
                     </div>
                 </div>
             </div>
@@ -899,7 +921,8 @@
             <!-- FOOTER -->
             <div
                 style="margin-top:24px;text-align:center;color:var(--text-dim);font-size:0.75rem;border-top:1px solid var(--border);padding-top:20px;">
-                <i class="fas fa-shield-alt" style="color:var(--yellow);"></i> Hari Crackers Admin Panel
+                <i class="fas fa-shield-alt" style="color:var(--yellow);"></i> Hari Crackers Admin
+                Panel
             </div>
         </div>
     </main>
@@ -931,6 +954,7 @@
             orderBy,
             limit,
             onSnapshot,
+            serverTimestamp,
             where   // ✅ ADD THIS
         } from "firebase/firestore";
         // ============================================================
@@ -1082,35 +1106,35 @@
         }
 
 
- // ============================================================
-// LISTEN TO STOCK ALERTS — Sidebar badge count (Low Stock Products)
-// ============================================================
-function listenToStockAlerts() {
-    const productsRef = collection(db, 'products');
-    
-    onSnapshot(productsRef, (snapshot) => {
-        let lowStockCount = 0;
-        
-        snapshot.docs.forEach(doc => {
-            const data = doc.data();
-            const stockQty = data.stockQty;
-            const threshold = data.lowStockThreshold || 5;
-            
-            // Stock track pannirundha + threshold-ku kuraiya irundha count pannum
-            if (typeof stockQty === 'number' && stockQty <= threshold) {
-                lowStockCount++;
-            }
-        });
-        
-        const badge = document.getElementById('stockAlertBadge');
-        if (badge) {
-            badge.textContent = lowStockCount;
-            badge.style.display = lowStockCount > 0 ? 'inline-block' : 'none';
+        // ============================================================
+        // LISTEN TO STOCK ALERTS — Sidebar badge count (Low Stock Products)
+        // ============================================================
+        function listenToStockAlerts() {
+            const productsRef = collection(db, 'products');
+
+            onSnapshot(productsRef, (snapshot) => {
+                let lowStockCount = 0;
+
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const stockQty = data.stockQty;
+                    const threshold = data.lowStockThreshold || 5;
+
+                    // Stock track pannirundha + threshold-ku kuraiya irundha count pannum
+                    if (typeof stockQty === 'number' && stockQty <= threshold) {
+                        lowStockCount++;
+                    }
+                });
+
+                const badge = document.getElementById('stockAlertBadge');
+                if (badge) {
+                    badge.textContent = lowStockCount;
+                    badge.style.display = lowStockCount > 0 ? 'inline-block' : 'none';
+                }
+            }, (error) => {
+                console.error('Stock alert badge error:', error);
+            });
         }
-    }, (error) => {
-        console.error('Stock alert badge error:', error);
-    });
-}
 
         // ============================================================
         // UPDATE STATS
@@ -1323,10 +1347,76 @@ function listenToStockAlerts() {
 
 
         console.log('✅ Hari Crackers Dashboard loaded with Order IDs (QC001, QC002...)');
-console.log('📊 Connected to Firebase Firestore');
+        console.log('📊 Connected to Firebase Firestore');
 
-// ✅ IDHA ADD PANNUNGA — dashboard data load panna
-loadDashboardData();
+        // ✅ IDHA ADD PANNUNGA — dashboard data load panna
+        loadDashboardData();
+        loadTodayOfflineStats(); // <--- ADD THIS LINE
+       
+   // ============================================================
+// LOAD TODAY'S OFFLINE BILLING DATA (USING ORDERS COLLECTION)
+// ============================================================
+async function loadTodayOfflineStats() {
+    try {
+        // Unga bill history 'orders' collection thaan use pannudhu
+        const billsRef = collection(db, 'orders'); 
+        const snapshot = await getDocs(billsRef);
+        
+        let todayBillsCount = 0;
+        let todayRevenue = 0;
+
+        const today = new Date();
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+
+            // 1. OFFLINE BILL-A CHECK PANNUM (Unga code la 'walk-in' nu thaan irukku)
+            if (data.source === 'walk-in') { 
+
+                // 2. Unga code la date 'orderDate' la save aagirukku
+                let rawDate = data.orderDate;
+                let billDate = null;
+
+                if (rawDate) {
+                    if (typeof rawDate.toDate === 'function') {
+                        billDate = rawDate.toDate(); // Firestore Timestamp
+                    } else if (typeof rawDate === 'string' || typeof rawDate === 'number') {
+                        billDate = new Date(rawDate); // String or number
+                    } else if (rawDate.seconds) {
+                        billDate = new Date(rawDate.seconds * 1000);
+                    }
+                }
+
+                // 3. TODAY-A CHECK PANNUM
+                if (billDate && !isNaN(billDate.getTime())) {
+                    const isToday = billDate.getDate() === today.getDate() &&
+                                    billDate.getMonth() === today.getMonth() &&
+                                    billDate.getFullYear() === today.getFullYear();
+
+                    if (isToday) {
+                        todayBillsCount++;
+                        
+                        // 4. Amount 'totalAmount' la irukku
+                        const amount = Number(data.totalAmount || 0);
+                        todayRevenue += amount;
+                    }
+                }
+            }
+        });
+
+        // 5. UPDATE UI
+        const billsEl = document.getElementById('todayOfflineBills');
+        const revenueEl = document.getElementById('todayOfflineRevenue');
+        
+        if (billsEl) billsEl.textContent = todayBillsCount;
+        if (revenueEl) revenueEl.textContent = todayRevenue.toLocaleString('en-IN');
+
+        console.log(`✅ Today's Walk-in Bills: ${todayBillsCount}, Revenue: ₹${todayRevenue}`);
+
+    } catch (error) {
+        console.error("Error loading offline stats:", error);
+    }
+}
     </script>
 </body>
 

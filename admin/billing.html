@@ -475,10 +475,19 @@
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const LOGO = '../pictures/logo-removebg-preview.png', K = 'haricrackers_pos_draft_v2', KH = 'haricrackers_pos_held_v2';
         const PAPER = 80; // thermal paper width in mm: 80 or 58
+        const MAX_PAGE_MM = 280; // longest paper (mm) your printer accepts. Bills taller than this are split into pages instead of being shrunk
         let products = [], bill = [], cat = 'All', hl = 0, saving = false, pendingRm = null;
 
         // ✅ EDIT MODE STATE
         let editingOrder = null;   // { id, orderId, items, ... } if editing
+
+        // ---------- edit-mode stock helpers ----------
+        // Stock is only adjusted for walk-in bills (or bills flagged stockDeducted)
+        const stockTracked = o => !!o && (o.stockDeducted === true || o.source === 'walk-in');
+        const itemQty = x => Number(x.qty ?? x.quantity) || 0;
+        const oldQtyOf = id => (editingOrder && stockTracked(editingOrder))
+            ? (editingOrder.items || []).filter(x => x.productId === id && !x.isManual).reduce((s, x) => s + itemQty(x), 0)
+            : 0;
 
         // live bill -> shared with Stock Management ("In Bill" column)
         const CID = (() => { try { let c = sessionStorage.getItem('hc_cid'); if (!c) { c = 'b' + Math.random().toString(36).slice(2, 9); sessionStorage.setItem('hc_cid', c); } return c; } catch (e) { return 'b' + Date.now(); } })();
@@ -500,7 +509,14 @@
 
         // ---------- products ----------
         const stockOf = p => typeof p.stockQty === 'number' ? p.stockQty : null;
-        const isOut = p => stockOf(p) !== null ? stockOf(p) <= 0 : p.inStock === false;
+        // stock available for THIS bill: in edit mode the old bill's qty is added back
+        const availOf = p => {
+            const s = stockOf(p);
+            if (s === null) return null;
+            if (editingOrder && !stockTracked(editingOrder)) return null;
+            return s + oldQtyOf(p.id);
+        };
+        const isOut = p => { const a = availOf(p); return a !== null ? a <= 0 : p.inStock === false; };
         const filtered = () => { const t = $('search').value.trim().toLowerCase(); return products.filter(p => (cat === 'All' || (p.category || 'Others') === cat) && (!t || (p.name || '').toLowerCase().includes(t))); };
         const pickable = () => filtered().filter(p => !isOut(p));
 
@@ -523,7 +539,7 @@
             const old = document.querySelector('#plistWrap')?.scrollTop || 0, list = filtered(), pk = pickable(), hid = pk[hl]?.id;
             if (!list.length) { $('plist').innerHTML = '<div class="empty">No products found</div>'; return; }
             $('plist').innerHTML = `<div class="twrap" id="plistWrap"><table><thead><tr><th>Product</th><th class="n">Price</th><th class="n">Stock</th><th class="n">Action</th></tr></thead><tbody>` + list.map(p => {
-                const s0 = stockOf(p), out = isOut(p), q = bill.find(b => b.id === p.id)?.qty || 0, th = p.lowStockThreshold || 5, s = s0 === null ? null : s0 - q;
+                const s0 = availOf(p), out = isOut(p), q = bill.find(b => b.id === p.id)?.qty || 0, th = p.lowStockThreshold || 5, s = s0 === null ? null : s0 - q;
                 const tag = out ? '<span class="stk ou">Out of Stock</span>' : (s !== null && s <= 0) ? '<span class="stk ou">All in bill</span>' : (s !== null && s <= th) ? `<span class="stk lo">${s} left</span>` : `<span class="stk in">${s !== null ? s + ' In Stock' : 'In Stock'}</span>`;
                 return `<tr data-id="${p.id}" class="${out ? 'out' : ''} ${q ? 'incart' : ''} ${p.id === hid ? 'kb' : ''}"><td><div class="pc"><img class="pimg" src="${esc(p.imageUrl || LOGO)}" data-name="${esc(p.name)}" onerror="this.src='${LOGO}'"><span>${esc(p.name || 'Unnamed')}</span></div></td><td class="n">₹${p.price || 0}</td><td class="n">${tag}</td><td class="n">${q ? `<span class="qbadge" title="Click to reduce">${q}</span>` : ''}<button class="addb" ${out || (s !== null && s <= 0) ? 'disabled' : ''}><i class="fas fa-plus"></i> Add</button></td></tr>`;
             }).join('') + '</tbody></table></div>';
@@ -545,16 +561,16 @@
         };
 
         // ---------- live stock helpers ----------
-        const leftOf = i => { if (i.manual) return null; const p = products.find(x => x.id === i.id); const s = p ? stockOf(p) : null; return s === null ? null : s - i.qty; };
+        const leftOf = i => { if (i.manual) return null; const p = products.find(x => x.id === i.id); const s = p ? availOf(p) : null; return s === null ? null : s - i.qty; };
         const stlHtml = i => { const l = leftOf(i); return l === null ? '—' : `<span class="stk ${l < 0 ? 'ou' : l <= 5 ? 'lo' : 'in'}">${l}</span>`; };
         function refreshStockViews() {
             document.querySelectorAll('#cart tr').forEach(tr => { const it = bill[+tr.dataset.i]; if (it) tr.querySelector('.stl').innerHTML = stlHtml(it); });
-            if (sel) { const fresh = products.find(p => p.id === sel.id); if (fresh) { sel = fresh; const s = stockOf(fresh); $('eStock').textContent = s !== null ? s : 'In Stock'; } }
+            if (sel) { const fresh = products.find(p => p.id === sel.id); if (fresh) { sel = fresh; const s = availOf(fresh); $('eStock').textContent = s !== null ? s : 'In Stock'; } }
             entryInfo();
         }
         function entryInfo() {
             const b = $('eInfo'); if (!sel) { b.innerHTML = ''; return; }
-            const s = stockOf(sel); if (s === null) { b.innerHTML = ''; return; }
+            const s = availOf(sel); if (s === null) { b.innerHTML = ''; return; }
             const inBill = bill.find(x => x.id === sel.id)?.qty || 0, q = parseInt($('eQty').value, 10) || 0, left = s - inBill - q;
             b.innerHTML = `📦 Stock: <b>${s}</b> &nbsp;|&nbsp; In Bill: <b>${inBill}</b> &nbsp;|&nbsp; After Adding: <b class="${left < 0 ? 'neg' : 'pos'}">${left}</b>`;
         }
@@ -567,7 +583,7 @@
         // ---------- bill ----------
         function addProduct(p) {
             if (!p) return;
-            const s = stockOf(p), ex = bill.find(b => b.id === p.id);
+            const s = availOf(p), ex = bill.find(b => b.id === p.id);
             if (isOut(p)) return toast('Out of stock: ' + p.name, 'error');
             if (s !== null && (ex ? ex.qty : 0) + 1 > s) return toast(`Only ${s} in stock: ${p.name}`, 'error');
             if (ex) ex.qty++; else bill.push({ id: p.id, name: p.name || 'Unnamed', price: Number(p.price) || 0, oldPrice: Number(p.oldPrice) || Number(p.price) || 0, qty: 1, included: true });
@@ -613,7 +629,7 @@
         $('cart').oninput = e => { const k = e.target.dataset.k; if (!k) return; const tr = e.target.closest('tr'), it = bill[+tr.dataset.i]; it[k] = Math.max(0, parseFloat(e.target.value) || 0); rowSync(tr, it); };
         $('cart').onchange = e => {
             const k = e.target.dataset.k; if (!k) return; const tr = e.target.closest('tr'), it = bill[+tr.dataset.i]; let v = parseFloat(e.target.value) || 0;
-            if (k === 'qty') { v = Math.max(1, Math.floor(v)); const s = it.manual ? null : stockOf(products.find(p => p.id === it.id) || {}); if (s !== null && v > s) { v = s; toast('Stock limit: ' + s, 'error'); } }
+            if (k === 'qty') { v = Math.max(1, Math.floor(v)); const s = it.manual ? null : availOf(products.find(p => p.id === it.id) || {}); if (s !== null && v > s) { v = s; toast('Stock limit: ' + s, 'error'); } }
             it[k] = Math.max(0, v); e.target.value = it[k]; rowSync(tr, it); renderProducts();
         };
         $('cart').onkeydown = e => {
@@ -631,8 +647,10 @@
         function load(s) { bill = Array.isArray(s.bill) ? s.bill : []; $('cName').value = s.name || ''; $('cPhone').value = s.phone || ''; $('dType').value = s.dType || 'pct'; $('dVal').value = s.dVal || 0; $('pay').value = s.pay || 'Cash'; $('recv').value = s.recv || ''; renderCart(); }
 
         function persist() {
+            // Edit mode: never save as draft (a page reload would otherwise reopen the old bill as a NEW bill and deduct stock again)
+            if (editingOrder) return;
             try { localStorage.setItem(K, JSON.stringify(snap())); } catch (e) { }
-            if (!editingOrder) publishLive();
+            publishLive();
         }
 
         const held = () => { try { return JSON.parse(localStorage.getItem(KH)) || []; } catch (e) { return []; } };
@@ -648,7 +666,11 @@
         };
         $('heldBtn').onclick = () => { renderHeld(); $('heldModal').classList.add('on'); };
         $('heldClose').onclick = () => $('heldModal').classList.remove('on');
-        function hold() { if (!bill.length) return toast('Bill empty', 'info'); const h = held(); h.push({ ...snap(), at: new Date().toLocaleTimeString('en-IN') }); localStorage.setItem(KH, JSON.stringify(h)); reset(); renderHeld(); toast('⏸ Bill held', 'success'); }
+        function hold() {
+            if (editingOrder) return toast('Edit mode-la Hold panna mudiyaadhu. Update Bill illa Clear (F8) pannunga', 'error');
+            if (!bill.length) return toast('Bill empty', 'info');
+            const h = held(); h.push({ ...snap(), at: new Date().toLocaleTimeString('en-IN') }); localStorage.setItem(KH, JSON.stringify(h)); reset(); renderHeld(); toast('⏸ Bill held', 'success');
+        }
 
         function reset() {
             editingOrder = null;
@@ -661,7 +683,7 @@
         }
 
         $('holdBtn').onclick = hold;
-        $('clearBtn').onclick = () => { if (bill.length && !confirm('Clear the current bill?')) return; reset(); };
+        $('clearBtn').onclick = () => { if ((bill.length || editingOrder) && !confirm(editingOrder ? 'Cancel editing this bill?' : 'Clear the current bill?')) return; reset(); };
 
         // ---------- customer history ----------
         async function lookup() {
@@ -685,14 +707,18 @@
         // ✅ EDIT BILL LOGIC
         // ==========================================
         $('editBillBtn').onclick = () => {
-            if (bill.length > 0 && !confirm('Current bill-la items irukku. Adha clear panni edit pannalama?')) return;
+            if (bill.length > 0 || editingOrder) {
+                if (!confirm('Current bill-la items irukku. Adha clear panni edit pannalama?')) return;
+                reset();
+            }
             $('editModal').classList.add('on');
             $('editBillInput').value = '';
             $('editError').style.display = 'none';
             $('editBillInput').focus();
         };
 
-        $('editCancelBtn').onclick = () => $('editModal').classList.remove('on');
+        $('editCancelBtn').onclick = () => { $('editModal').classList.remove('on'); $('eItem').focus(); };
+        $('editBillInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('editLoadBtn').click(); } });
 
         $('editLoadBtn').onclick = async () => {
             const orderId = $('editBillInput').value.trim().toUpperCase();
@@ -716,15 +742,18 @@
                 editingOrder = { id: d.id, ...d.data() };
 
                 // Load items to bill
-                bill = (editingOrder.items || []).map(i => ({
-                    id: i.productId || ('manual-' + Math.random()),
-                    name: i.name,
-                    price: Number(i.price) || 0,
-                    oldPrice: Number(i.oldPrice) || Number(i.price) || 0,
-                    qty: Number(i.qty) || 1,
-                    included: true,
-                    manual: !!i.isManual
-                }));
+                bill = (editingOrder.items || []).map(i => {
+                    const pid = i.productId || '';
+                    return {
+                        id: pid || ('manual-' + Math.random().toString(36).slice(2, 8)),
+                        name: i.name || i.productName || 'Item',
+                        price: Number(i.price) || 0,
+                        oldPrice: Number(i.oldPrice) || Number(i.price) || 0,
+                        qty: itemQty(i) || 1,
+                        included: true,
+                        manual: !!i.isManual || !pid
+                    };
+                });
 
                 // Load customer details
                 $('cName').value = editingOrder.customerName || '';
@@ -732,22 +761,24 @@
                 $('pay').value = editingOrder.paymentMethod || 'Cash';
                 $('recv').value = editingOrder.amountReceived || '';
 
-                // Load discounts
-                if (editingOrder.discount) {
-                    $('dType').value = 'flat';
-                    $('dVal').value = editingOrder.discount;
-                }
+                // Load discount (always reset, so an old discount never sticks)
+                $('dType').value = 'flat';
+                $('dVal').value = Number(editingOrder.discount) || 0;
 
                 renderCart();
                 $('editModal').classList.remove('on');
 
                 // Change Header & Button text to indicate Edit Mode
-                document.getElementById('pageHeader').innerHTML = `✏️ Editing Bill <span>— ${orderId}</span>`;
+                document.getElementById('pageHeader').innerHTML = `✏️ Editing Bill <span>— ${esc(orderId)}</span>`;
                 $('saveBtn').innerHTML = `<i class="fas fa-save"></i> Update Bill <kbd>F9</kbd>`;
 
-                toast('✅ Bill ' + orderId + ' Loaded for Edit', 'info');
+                toast(stockTracked(editingOrder)
+                    ? '✅ Bill ' + orderId + ' Loaded for Edit'
+                    : 'ℹ️ Bill ' + orderId + ' loaded. Stock was not deducted for this order, so stock will not change', 'info');
+                $('eItem').focus();
             } catch (e) {
                 console.error(e);
+                editingOrder = null;
                 $('editError').textContent = '⚠️ Error: ' + e.message;
                 $('editError').style.display = 'block';
             } finally {
@@ -761,21 +792,14 @@
             const t = calc(); if (!t.a.length || saving) return;
             const recv = $('recv').value === '' ? t.grand : parseFloat($('recv').value) || 0, name = $('cName').value.trim() || 'Walk-in Customer', phone = $('cPhone').value.trim();
 
-            // STOCK VALIDATION
-            for (const i of t.a) {
-                if (i.manual) continue;
-                const p = products.find(x => x.id === i.id);
-                const s = stockOf(p || {});
-                if (s === null) continue;
-
-                let oldQty = 0;
-                if (editingOrder) {
-                    const old = (editingOrder.items || []).find(x => x.productId === i.id);
-                    oldQty = old ? Number(old.qty) || 0 : 0;
-                }
-                const needed = i.qty - oldQty; // extra stock needed
-                if (needed > 0 && s < needed) {
-                    return toast(`Stock insufficient: ${i.name} (need ${needed} more, only ${s} available)`, 'error');
+            // STOCK VALIDATION (edit mode: the old bill's qty is already added back inside availOf)
+            const want = {};
+            t.a.forEach(i => { if (!i.manual) want[i.id] = (want[i.id] || 0) + i.qty; });
+            for (const pid of Object.keys(want)) {
+                const p = products.find(x => x.id === pid); if (!p) continue;
+                const avail = availOf(p); if (avail === null) continue;
+                if (want[pid] > avail) {
+                    return toast(`Stock insufficient: ${p.name} (need ${want[pid]}, only ${avail} available)`, 'error');
                 }
             }
 
@@ -785,23 +809,25 @@
 
                 // STOCK UPDATES
                 if (editingOrder) {
-                    // EDIT MODE — diff apply
-                    const oldMap = {};
-                    (editingOrder.items || []).forEach(i => { if (i.isManual) return; oldMap[i.productId] = (oldMap[i.productId] || 0) + (Number(i.qty) || 0); });
-                    const newMap = {};
-                    t.a.forEach(i => { if (i.manual) return; newMap[i.id] = (newMap[i.id] || 0) + i.qty; });
+                    // EDIT MODE — apply only the difference (skipped for orders whose stock was never deducted)
+                    if (stockTracked(editingOrder)) {
+                        const oldMap = {};
+                        (editingOrder.items || []).forEach(i => { if (i.isManual || !i.productId) return; oldMap[i.productId] = (oldMap[i.productId] || 0) + itemQty(i); });
+                        const newMap = {};
+                        t.a.forEach(i => { if (i.manual) return; newMap[i.id] = (newMap[i.id] || 0) + i.qty; });
 
-                    const allIds = new Set([...Object.keys(oldMap), ...Object.keys(newMap)]);
-                    for (const pid of allIds) {
-                        const oldQ = oldMap[pid] || 0, newQ = newMap[pid] || 0, diff = newQ - oldQ;
-                        if (diff === 0) continue;
+                        const allIds = new Set([...Object.keys(oldMap), ...Object.keys(newMap)]);
+                        for (const pid of allIds) {
+                            const oldQ = oldMap[pid] || 0, newQ = newMap[pid] || 0, diff = newQ - oldQ;
+                            if (diff === 0) continue;
 
-                        const p = products.find(x => x.id === pid); if (!p) continue;
-                        const before = typeof p.stockQty === 'number' ? p.stockQty : 0, after = Math.max(0, before - diff), th = p.lowStockThreshold || 5;
+                            const p = products.find(x => x.id === pid); if (!p) continue;
+                            const before = typeof p.stockQty === 'number' ? p.stockQty : 0, after = Math.max(0, before - diff), th = p.lowStockThreshold || 5;
 
-                        batch.update(doc(db, 'products', pid), { stockQty: increment(-diff), inStock: after > 0, updatedAt: now.toISOString(), lastSoldAt: now.toISOString() });
-                        batch.set(doc(collection(db, 'stockMovements')), { productId: pid, productName: p.name, type: diff > 0 ? 'sale' : 'return', change: -diff, before, after, note: 'Bill edit ' + editingOrder.orderId, by: auth.currentUser?.email || 'unknown', date: now.toISOString(), createdAt: serverTimestamp() });
-                        if (after <= th) lows.push(`${p.name} (${after <= 0 ? 'OUT' : after + ' left'})`);
+                            batch.update(doc(db, 'products', pid), { stockQty: increment(-diff), inStock: after > 0, updatedAt: now.toISOString(), lastSoldAt: now.toISOString() });
+                            batch.set(doc(collection(db, 'stockMovements')), { productId: pid, productName: p.name, type: diff > 0 ? 'sale' : 'return', change: -diff, before, after, note: 'Bill edit ' + editingOrder.orderId, by: auth.currentUser?.email || 'unknown', date: now.toISOString(), createdAt: serverTimestamp() });
+                            if (after <= th) lows.push(`${p.name} (${after <= 0 ? 'OUT' : after + ' left'})`);
+                        }
                     }
                 } else {
                     // NEW BILL — full stock deduct
@@ -823,6 +849,7 @@
                 };
 
                 let orderId;
+                const wasEdit = !!editingOrder, origDate = editingOrder?.orderDate || null;
                 if (editingOrder) {
                     orderId = editingOrder.orderId;
                     batch.update(doc(db, 'orders', editingOrder.id), { ...orderPayload, editedAt: now.toISOString(), editedBy: auth.currentUser?.email || 'unknown', editCount: (editingOrder.editCount || 0) + 1 });
@@ -835,9 +862,9 @@
 
                 await batch.commit();
 
-                printInvoice({ orderId, name, phone, pay, items: t.a, t, recv, date: now.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }), isEdit: !!editingOrder });
+                printInvoice({ orderId, name, phone, pay, items: t.a, t, recv, origDate, isEdit: wasEdit });
 
-                toast(`✅ Bill ${orderId} ${editingOrder ? 'updated' : 'saved'}`, 'success');
+                toast(`✅ Bill ${orderId} ${wasEdit ? 'updated' : 'saved'}`, 'success');
 
                 setTimeout(() => { reset(); }, 800);
 
@@ -918,11 +945,12 @@
         async function printInvoice(o) {
             const is58 = PAPER === 58;
             const W = is58 ? '48mm' : '76mm';
-            const FS = is58 ? 10.5 : 11.5;
             const LW = is58 ? '27mm' : '34mm';
 
             const N = n => Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            const now = new Date();
+            // edited bills keep their ORIGINAL date & time
+            let now = o.origDate ? new Date(o.origDate) : new Date();
+            if (isNaN(now.getTime())) now = new Date();
             const dStr = now.toLocaleDateString('en-GB');
             const tStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
             const cashier = (auth.currentUser?.email || '').split('@')[0] || 'Admin';
@@ -953,13 +981,13 @@
                 } catch (err) { console.error('QR generation failed:', err); resolve(null); }
             });
 
+            // MRP column is hidden on the printed bill (bigger, clearer text); MRP Total / Offer Discount lines still show the savings
             const rows = (o.items || []).map((i, x) => {
-                const qty = Number(i.qty || 0), rate = Number(i.price || 0), amount = qty * rate, mrp = Number(i.oldPrice || 0);
+                const qty = Number(i.qty || 0), rate = Number(i.price || 0), amount = qty * rate;
                 return `
 <tr class="it-row">
     <td class="it-sn">${x + 1}</td>
     <td class="it-name">${esc(i.name || '')}</td>
-    <td class="it-mrp">${mrp > 0 ? N(mrp) : ''}</td>
     <td class="it-qty">${qty}</td>
     <td class="it-rate">${N(rate)}</td>
     <td class="it-amt">${N(amount)}</td>
@@ -981,70 +1009,63 @@ body {
     margin: 0 auto;
     padding: 0;
     background: #fff; color: #000; font-family: Arial, Helvetica, sans-serif;
-    font-size: ${FS}px; line-height: 1.25; font-weight: 600;
+    font-size: ${is58 ? 11.5 : 13}px; line-height: 1.3; font-weight: 700;
 }
 #rcpt { padding: 2.5mm 1.5mm 7mm 1.5mm; }
 .c { text-align: center; }
 .logo { width: ${LW}; max-width: 45mm; max-height: 20mm; height: auto; object-fit: contain; display: block; margin: 0 auto 2px; }
 .fallback-logo { filter: grayscale(1) contrast(1.35); }
-.shop { font-size: ${is58 ? 16 : 19}px; font-weight: 900; letter-spacing: .3px; line-height: 1.05; margin-top: 1px; }
-.tag { font-size: ${is58 ? 9 : 10}px; font-weight: 800; letter-spacing: .4px; margin-top: 2px; }
-.addr { font-size: ${is58 ? 8.5 : 9.5}px; font-weight: 700; line-height: 1.25; margin-top: 3px; }
-.ph { font-size: ${is58 ? 9 : 10}px; font-weight: 900; margin-top: 3px; }
-.gst { font-size: ${is58 ? 8 : 9}px; font-weight: 700; margin-top: 2px; }
-.dash { border-top: 1px dashed #000; margin: 4px 0; }
-.sol { border-top: 1.4px solid #000; margin: 5px 0; }
-.dbl { border-top: 2px double #000; margin: 5px 0; }
-.bill-no-wrap { text-align: center; margin: 3px 0; }
-.bill-no { display: inline-block; font-size: ${is58 ? 11 : 13}px; font-weight: 900; letter-spacing: 1.5px; padding: 2px 10px; border: 1.5px solid #000; }
-.meta { font-size: ${is58 ? 9.5 : 10.5}px; margin: 4px 0; }
-.meta .ln { display: flex; justify-content: space-between; align-items: flex-start; gap: 7px; margin: 2px 0; line-height: 1.35; }
+.shop { font-size: ${is58 ? 17 : 21}px; font-weight: 900; letter-spacing: .3px; line-height: 1.05; margin-top: 1px; }
+.tag { font-size: ${is58 ? 10.5 : 12}px; font-weight: 800; letter-spacing: .4px; margin-top: 2px; }
+.addr { font-size: ${is58 ? 9.5 : 11}px; font-weight: 800; line-height: 1.3; margin-top: 3px; }
+.ph { font-size: ${is58 ? 10.5 : 12}px; font-weight: 900; margin-top: 3px; }
+.gst { font-size: ${is58 ? 9.5 : 11}px; font-weight: 800; margin-top: 2px; }
+.dash { border-top: 1.2px dashed #000; margin: 5px 0; }
+.sol { border-top: 1.6px solid #000; margin: 6px 0; }
+.bill-no-wrap { text-align: center; margin: 4px 0; }
+.bill-no { display: inline-block; font-size: ${is58 ? 13 : 16}px; font-weight: 900; letter-spacing: 1.5px; padding: 2px 10px; border: 2px solid #000; }
+.meta { font-size: ${is58 ? 10.5 : 12}px; margin: 4px 0; }
+.meta .ln { display: flex; justify-content: space-between; align-items: flex-start; gap: 7px; margin: 3px 0; line-height: 1.35; }
 .meta .ln > span { min-width: 0; }
 .meta b { font-weight: 900; }
 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.it { width: 100%; font-size: ${is58 ? 9 : 10.5}px; margin-top: 2px; }
-.it thead th { font-size: ${is58 ? 8 : 9}px; font-weight: 900; text-transform: uppercase; letter-spacing: .1px; padding: 3px 1px; border-top: 1.3px solid #000; border-bottom: 1.3px solid #000; text-align: right; white-space: nowrap; }
-.it-sn-h { width: 6% !important; text-align: left !important; }
-.it-name-h { width: 34% !important; text-align: left !important; }
-.it-mrp-h { width: 13% !important; }
-.it-qty-h { width: 9% !important; text-align: center !important; }
-.it-rate-h { width: 18% !important; }
-.it-amt-h { width: 20% !important; }
-.it tbody td { padding: 3px 1px; vertical-align: top; line-height: 1.3; }
-.it-sn { width: 6%; text-align: left; padding-left: 1px !important; font-weight: 700; }
-.it-name { width: 34%; text-align: left; padding-right: 3px !important; word-break: normal; overflow-wrap: anywhere; font-weight: 800; }
-.it-mrp { width: 13%; text-align: right; font-size: ${is58 ? 8 : 9}px; color: #555; text-decoration: line-through; font-weight: 600; }
-.it-qty { width: 9%; text-align: center; font-weight: 800; }
-.it-rate { width: 18%; text-align: right; font-weight: 700; }
+.it { width: 100%; font-size: ${is58 ? 11 : 12.5}px; margin-top: 2px; }
+.it thead th { font-size: ${is58 ? 9 : 10.5}px; font-weight: 900; text-transform: uppercase; padding: 4px 1px; border-top: 1.6px solid #000; border-bottom: 1.6px solid #000; text-align: right; white-space: nowrap; }
+.it-sn-h { width: 7%; text-align: left !important; }
+.it-name-h { width: 45%; text-align: left !important; }
+.it-qty-h { width: 10%; text-align: center !important; }
+.it-rate-h { width: 18%; }
+.it-amt-h { width: 20%; }
+.it tbody td { padding: 4px 1px; vertical-align: top; line-height: 1.3; }
+.it-sn { width: 7%; text-align: left; padding-left: 1px !important; font-weight: 800; }
+.it-name { width: 45%; text-align: left; padding-right: 3px !important; word-break: normal; overflow-wrap: anywhere; font-weight: 900; font-size: ${is58 ? 11.5 : 13}px; }
+.it-qty { width: 10%; text-align: center; font-weight: 900; }
+.it-rate { width: 18%; text-align: right; font-weight: 800; }
 .it-amt { width: 20%; text-align: right; font-weight: 900; }
-.it tbody tr { border-bottom: 1px dotted #000; }
-.it tbody tr:last-child { border-bottom: 1.3px solid #000; }
-.sum { font-size: ${is58 ? 9.5 : 10.5}px; margin-top: 4px; }
-.sum .ln { display: flex; justify-content: space-between; gap: 5px; margin: 2.5px 0; line-height: 1.3; }
-.sum .ln span:last-child { font-weight: 800; }
-.tot { display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #000; border-bottom: 2px solid #000; background: #fff; padding: 5px 2px; margin: 6px 0; }
-.tot .l { font-size: ${is58 ? 12 : 14}px; font-weight: 900; letter-spacing: 1.5px; }
-.tot .v { font-size: ${is58 ? 17 : 20}px; font-weight: 900; line-height: 1; }
-.words { font-size: ${is58 ? 8.5 : 9.5}px; font-weight: 800; text-align: center; margin: 3px 0 4px; line-height: 1.3; }
-.save { text-align: center; border: 1px dashed #000; padding: 4px 3px; font-size: ${is58 ? 9 : 10}px; font-weight: 900; margin: 5px 0; letter-spacing: .3px; }
-.pay { font-size: ${is58 ? 9.5 : 10.5}px; margin-top: 3px; }
-.pay .ln { display: flex; justify-content: space-between; gap: 5px; margin: 2.5px 0; line-height: 1.3; }
+.it tbody tr { border-bottom: 1px dotted #000; break-inside: avoid; page-break-inside: avoid; }
+.it tbody tr:last-child { border-bottom: 1.6px solid #000; }
+.sum { font-size: ${is58 ? 11 : 12.5}px; margin-top: 5px; }
+.sum .ln { display: flex; justify-content: space-between; gap: 5px; margin: 3px 0; line-height: 1.3; }
+.sum .ln span:last-child { font-weight: 900; }
+.tot { display: flex; justify-content: space-between; align-items: center; border-top: 2.5px solid #000; border-bottom: 2.5px solid #000; background: #fff; padding: 6px 2px; margin: 7px 0; }
+.tot .l { font-size: ${is58 ? 13 : 16}px; font-weight: 900; letter-spacing: 1.5px; }
+.tot .v { font-size: ${is58 ? 18 : 23}px; font-weight: 900; line-height: 1; }
+.words { font-size: ${is58 ? 10 : 11.5}px; font-weight: 900; text-align: center; margin: 4px 0 5px; line-height: 1.3; }
+.save { text-align: center; border: 1.5px dashed #000; padding: 5px 3px; font-size: ${is58 ? 10.5 : 12}px; font-weight: 900; margin: 6px 0; letter-spacing: .3px; }
+.pay { font-size: ${is58 ? 11 : 12.5}px; margin-top: 4px; }
+.pay .ln { display: flex; justify-content: space-between; gap: 5px; margin: 3px 0; line-height: 1.3; }
 .pay .ln b { font-weight: 900; }
-.pay .due { font-weight: 900; font-size: ${is58 ? 10.5 : 11.5}px; border-top: 1px solid #000; padding-top: 3px; margin-top: 4px; }
-.qr-wrap { text-align: center; margin: 6px 0 3px; }
-.qr-wrap img { width: ${is58 ? '25mm' : '29mm'}; height: ${is58 ? '25mm' : '29mm'}; object-fit: contain; display: block; margin: 0 auto; }
-.qr-txt { font-size: ${is58 ? 8.5 : 9.5}px; font-weight: 900; letter-spacing: .5px; margin-top: 3px; }
-.qr-url { font-size: ${is58 ? 8 : 9}px; font-weight: 700; margin-top: 1px; }
-.contact { font-size: ${is58 ? 8 : 9}px; font-weight: 800; text-align: center; margin-top: 3px; line-height: 1.35; word-break: break-word; }
-.thx { font-size: ${is58 ? 12 : 14}px; font-weight: 900; text-align: center; margin-top: 4px; line-height: 1.2; }
-.wish { font-size: ${is58 ? 8.5 : 9.5}px; font-weight: 700; text-align: center; margin-top: 2px; line-height: 1.3; }
-.eoe { font-size: ${is58 ? 7.5 : 8.5}px; font-weight: 700; text-align: center; margin-top: 4px; letter-spacing: 1px; }
+.pay .due { font-weight: 900; font-size: ${is58 ? 12 : 14}px; border-top: 1.5px solid #000; padding-top: 4px; margin-top: 5px; }
+.qr-wrap { text-align: center; margin: 7px 0 4px; }
+.qr-wrap img { width: ${is58 ? '27mm' : '32mm'}; height: ${is58 ? '27mm' : '32mm'}; object-fit: contain; display: block; margin: 0 auto; }
+.qr-txt { font-size: ${is58 ? 10 : 11.5}px; font-weight: 900; letter-spacing: .5px; margin-top: 3px; }
+.qr-url { font-size: ${is58 ? 9.5 : 11}px; font-weight: 800; margin-top: 1px; }
+.contact { font-size: ${is58 ? 9.5 : 11}px; font-weight: 900; text-align: center; margin-top: 3px; line-height: 1.35; word-break: break-word; }
+.thx { font-size: ${is58 ? 13 : 16}px; font-weight: 900; text-align: center; margin-top: 5px; line-height: 1.2; }
+.wish { font-size: ${is58 ? 10 : 11.5}px; font-weight: 800; text-align: center; margin-top: 3px; line-height: 1.3; }
+.sum, .tot, .words, .save, .pay, .qr-wrap { break-inside: avoid; page-break-inside: avoid; }
 @media print {
-    html, body {
-        width: ${W};
-        margin: 0;
-        padding: 0;
-    }
+    html, body { width: ${W}; margin: 0; padding: 0; }
 }
 </style>
 </head>
@@ -1054,7 +1075,7 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 <div class="c">${logoTag}</div>
 <div class="c shop">${esc(SHOP.name)}</div>
 ${o.isEdit ? `<div class="c" style="font-weight:900;font-size:14px;letter-spacing:2px;border:2px solid #000;padding:2px;margin:2px 0;">*** EDITED BILL ***</div>` : ''}
-<div class="c tag">${esc(SHOP.tagline || 'Crackers & Fireworks')}</div>
+<div class="c tag">Crackers &amp; Fireworks</div>
 <div class="c addr">${esc(SHOP.address)}</div>
 <div class="c ph">Ph: ${esc(SHOP.phones)}</div>
 ${SHOP.gstin ? `<div class="c gst">GSTIN: ${esc(SHOP.gstin)}</div>` : ''}
@@ -1086,7 +1107,6 @@ ${SHOP.gstin ? `<div class="c gst">GSTIN: ${esc(SHOP.gstin)}</div>` : ''}
         <tr>
             <th class="it-sn-h">#</th>
             <th class="it-name-h">Product</th>
-            <th class="it-mrp-h">MRP</th>
             <th class="it-qty-h">Qty</th>
             <th class="it-rate-h">Rate</th>
             <th class="it-amt-h">Amt</th>
@@ -1097,8 +1117,9 @@ ${SHOP.gstin ? `<div class="c gst">GSTIN: ${esc(SHOP.gstin)}</div>` : ''}
 
 <div class="sol"></div>
 <div class="sum">
+    ${Number(t.offer || 0) > 0 ? `<div class="ln"><span>MRP Total</span><span>${N(t.mrp)}</span></div>
+    <div class="ln"><span>Offer Discount</span><span>- ${N(t.offer)}</span></div>` : ''}
     <div class="ln"><span>Sub Total</span><span>${N(t.sub)}</span></div>
-    ${Number(t.offer || 0) > 0 ? `<div class="ln"><span>Offer Discount</span><span>- ${N(t.offer)}</span></div>` : ''}
     ${Number(t.extra || 0) > 0 ? `<div class="ln"><span>Extra Discount</span><span>- ${N(t.extra)}</span></div>` : ''}
     ${Number(t.roundOff || 0) !== 0 ? `<div class="ln"><span>Round Off</span><span>${t.roundOff < 0 ? '- ' : '+ '}${N(Math.abs(Number(t.roundOff)))}</span></div>` : ''}
 </div>
@@ -1143,7 +1164,10 @@ ${qrImg ? `
             printWindow.document.write(html);
             printWindow.document.close();
 
-            // ✅ Measure #rcpt, then LOCK page height + receipt height so a 2nd page can never be created
+            // Measure #rcpt.
+            //  - Normal bill: page height = bill height (locked, so a 2nd blank page can never appear)
+            //  - Very long bill (taller than MAX_PAGE_MM): fixed page height, bill is split into pages at row boundaries
+            //    (otherwise the browser shrinks the whole bill to a tiny size)
             printWindow.onload = () => {
                 setTimeout(() => {
                     try {
@@ -1152,7 +1176,9 @@ ${qrImg ? `
                         const h = r.scrollHeight;
                         const mm = Math.ceil(h * 25.4 / 96 * 1.03) + 15;
                         const st = pd.createElement('style');
-                        st.textContent = `@page { size: ${PAPER}mm ${mm}mm; margin: 0; } html, body { height: ${mm}mm; overflow: hidden; } #rcpt { height: ${mm - 1}mm; overflow: hidden; }`;
+                        st.textContent = mm <= MAX_PAGE_MM
+                            ? `@page { size: ${PAPER}mm ${mm}mm; margin: 0; } html, body { height: ${mm}mm; overflow: hidden; } #rcpt { height: ${mm - 1}mm; overflow: hidden; }`
+                            : `@page { size: ${PAPER}mm ${MAX_PAGE_MM}mm; margin: 0; } html, body { height: auto; overflow: visible; } #rcpt { height: auto; overflow: visible; }`;
                         pd.head.appendChild(st);
                         printWindow.focus();
                         printWindow.print();
@@ -1203,7 +1229,7 @@ ${qrImg ? `
             if (sIdx < 0) { sIdx = l.length - 1; }
             if (sIdx >= l.length) { sIdx = 0; }
             b.innerHTML = l.map((p, i) => {
-                const s0 = stockOf(p);
+                const s0 = availOf(p);
                 const used = bill.find(x => x.id === p.id)?.qty || 0;
                 const s = s0 === null ? null : s0 - used;
                 return `
@@ -1230,7 +1256,7 @@ ${qrImg ? `
         function entryAmt() { $('eAmt').textContent = inr((parseFloat($('eRate').value) || 0) * (parseInt($('eQty').value, 10) || 0)); entryInfo(); }
         function pick(p) {
             if (!p) return; if (isOut(p)) return toast('Out of stock: ' + p.name, 'error');
-            sel = p; $('eItem').value = p.name; $('eRate').value = p.price || 0; $('eQty').value = 1; const s = stockOf(p); $('eStock').textContent = s !== null ? s : 'In Stock';
+            sel = p; $('eItem').value = p.name; $('eRate').value = p.price || 0; $('eQty').value = 1; const s = availOf(p); $('eStock').textContent = s !== null ? s : 'In Stock';
             $('sugg').style.display = 'none'; entryAmt(); $('eQty').focus(); $('eQty').select();
         }
         function clearEntry() { sel = null; $('eItem').value = ''; $('eRate').value = ''; $('eQty').value = 1; $('eStock').textContent = '—'; $('eAmt').textContent = '₹0'; $('sugg').style.display = 'none'; entryInfo(); $('eItem').focus(); }
@@ -1238,7 +1264,7 @@ ${qrImg ? `
             if (!sel) return toast('Item select pannunga', 'error');
             const q = Math.floor(parseFloat($('eQty').value)), r = parseFloat($('eRate').value);
             if (!(q >= 1)) { toast('Qty enter pannunga', 'error'); $('eQty').focus(); return; }
-            const s = stockOf(sel), ex = bill.find(b => b.id === sel.id), tot = (ex ? ex.qty : 0) + q;
+            const s = availOf(sel), ex = bill.find(b => b.id === sel.id), tot = (ex ? ex.qty : 0) + q;
             if (s !== null && tot > s) { toast(`Only ${s} in stock: ${sel.name}`, 'error'); $('eQty').focus(); $('eQty').select(); return; }
             if (ex) ex.qty = tot; else bill.push({ id: sel.id, name: sel.name || 'Unnamed', price: isNaN(r) ? Number(sel.price) || 0 : r, oldPrice: Number(sel.oldPrice) || Number(sel.price) || 0, qty: q, included: true });
             renderCart(); clearEntry();

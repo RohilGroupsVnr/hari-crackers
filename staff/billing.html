@@ -475,7 +475,8 @@
         const inr = n => '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 });
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const LOGO = '../pictures/logo-removebg-preview.png', K = 'haricrackers_pos_draft_v2', KH = 'haricrackers_pos_held_v2';
-        const PAPER = 80;
+        const PAPER = 80;        // thermal paper width in mm: 80 or 58
+        const MAX_PAGE_MM = 200; // longest page (mm). Bills taller than this are split into pages instead of being shrunk
         let products = [], bill = [], cat = 'All', hl = 0, saving = false, pendingRm = null;
 
         // ✅ EDIT MODE STATE
@@ -904,9 +905,10 @@
 
         async function printInvoice(o) {
             const is58 = PAPER === 58;
-            const W = is58 ? '48mm' : '76mm';
+            // ✅ full paper width (was 76mm / 48mm, which left the bill narrow in the centre)
+            const W = is58 ? '58mm' : '80mm';
             const FS = is58 ? 10.5 : 11.5;
-            const LW = is58 ? '27mm' : '34mm';
+            const LW = is58 ? '32mm' : '42mm';
 
             const N = n => Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const now = new Date();
@@ -965,14 +967,14 @@
 html { width: ${W}; }
 body {
     width: ${W};
-    margin: 0 auto;
+    margin: 0;
     padding: 0;
     background: #fff; color: #000; font-family: Arial, Helvetica, sans-serif;
     font-size: ${FS}px; line-height: 1.25; font-weight: 600;
 }
-#rcpt { padding: 2.5mm 1.5mm 7mm 1.5mm; }
+#rcpt { padding: 2.5mm 1mm 7mm 1mm; }
 .c { text-align: center; }
-.logo { width: ${LW}; max-width: 45mm; max-height: 20mm; height: auto; object-fit: contain; display: block; margin: 0 auto 2px; }
+.logo { width: ${LW}; max-width: 55mm; max-height: 20mm; height: auto; object-fit: contain; display: block; margin: 0 auto 2px; }
 .fallback-logo { filter: grayscale(1) contrast(1.35); }
 .shop { font-size: ${is58 ? 16 : 19}px; font-weight: 900; letter-spacing: .3px; line-height: 1.05; margin-top: 1px; }
 .tag { font-size: ${is58 ? 9 : 10}px; font-weight: 800; letter-spacing: .4px; margin-top: 2px; }
@@ -1004,7 +1006,7 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .it-qty { width: 9%; text-align: center; font-weight: 800; }
 .it-rate { width: 18%; text-align: right; font-weight: 700; }
 .it-amt { width: 20%; text-align: right; font-weight: 900; }
-.it tbody tr { border-bottom: 1px dotted #000; }
+.it tbody tr { border-bottom: 1px dotted #000; break-inside: avoid; page-break-inside: avoid; }
 .it tbody tr:last-child { border-bottom: 1.3px solid #000; }
 .sum { font-size: ${is58 ? 9.5 : 10.5}px; margin-top: 4px; }
 .sum .ln { display: flex; justify-content: space-between; gap: 5px; margin: 2.5px 0; line-height: 1.3; }
@@ -1026,6 +1028,7 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .thx { font-size: ${is58 ? 12 : 14}px; font-weight: 900; text-align: center; margin-top: 4px; line-height: 1.2; }
 .wish { font-size: ${is58 ? 8.5 : 9.5}px; font-weight: 700; text-align: center; margin-top: 2px; line-height: 1.3; }
 .eoe { font-size: ${is58 ? 7.5 : 8.5}px; font-weight: 700; text-align: center; margin-top: 4px; letter-spacing: 1px; }
+.sum, .tot, .words, .save, .pay, .qr-wrap { break-inside: avoid; page-break-inside: avoid; }
 @media print {
     html, body {
         width: ${W};
@@ -1130,6 +1133,10 @@ ${qrImg ? `
             printWindow.document.write(html);
             printWindow.document.close();
 
+            // Measure #rcpt.
+            //  - Normal bill: page height = bill height (locked, so a 2nd blank page can never appear)
+            //  - Very long bill (taller than MAX_PAGE_MM): fixed page height, bill is split into pages at row boundaries
+            //    (otherwise the browser shrinks the whole bill to a tiny size)
             printWindow.onload = () => {
                 setTimeout(() => {
                     try {
@@ -1138,7 +1145,9 @@ ${qrImg ? `
                         const h = r.scrollHeight;
                         const mm = Math.ceil(h * 25.4 / 96 * 1.03) + 15;
                         const st = pd.createElement('style');
-                        st.textContent = `@page { size: ${PAPER}mm ${mm}mm; margin: 0; } html, body { height: ${mm}mm; overflow: hidden; } #rcpt { height: ${mm - 1}mm; overflow: hidden; }`;
+                        st.textContent = mm <= MAX_PAGE_MM
+                            ? `@page { size: ${PAPER}mm ${mm}mm; margin: 0; } html, body { height: ${mm}mm; overflow: hidden; } #rcpt { height: ${mm - 1}mm; overflow: hidden; }`
+                            : `@page { size: ${PAPER}mm ${MAX_PAGE_MM}mm; margin: 0; } html, body { height: auto; overflow: visible; } #rcpt { height: auto; overflow: visible; }`;
                         pd.head.appendChild(st);
                         printWindow.focus();
                         printWindow.print();

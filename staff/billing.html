@@ -476,7 +476,10 @@
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const LOGO = '../pictures/logo-removebg-preview.png', K = 'haricrackers_pos_draft_v2', KH = 'haricrackers_pos_held_v2';
         const PAPER = 80;        // thermal paper width in mm: 80 or 58
-        const MAX_PAGE_MM = 200; // longest page (mm). Bills taller than this are split into pages instead of being shrunk
+        // ===== THERMAL ROLL SETTINGS (A4 illa, roll paper size) =====
+        const PAGE_W_MM = 76;     // bill page width (mm). 76 = ungaloda munnadi sari-aa print aana size. Innum full venumna 78 -> 80 try pannunga
+        const SIDE_PAD_MM = 2;    // left/right gap (mm). Edge-la text cut aana 3-4 aakkunga
+        const MAX_PAGE_MM = 280;  // oru page max length (mm). Idhai vida neelamaana bill next page-ku split aagum (shrink aagadhu)
         let products = [], bill = [], cat = 'All', hl = 0, saving = false, pendingRm = null;
 
         // ✅ EDIT MODE STATE
@@ -905,10 +908,8 @@
 
         async function printInvoice(o) {
             const is58 = PAPER === 58;
-            // ✅ full paper width (was 76mm / 48mm, which left the bill narrow in the centre)
-            const W = is58 ? '58mm' : '80mm';
             const FS = is58 ? 10.5 : 11.5;
-            const LW = is58 ? '32mm' : '42mm';
+            const LW = '48%'; // logo width (% of bill)
 
             const N = n => Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const now = new Date();
@@ -962,17 +963,17 @@
 <meta charset="UTF-8">
 <title>${esc(o.orderId || 'Bill')}</title>
 <style>
-@page { size: ${PAPER}mm 200mm; margin: 0; }
+@page { size: ${PAGE_W_MM}mm 200mm; margin: 0; }
 * { margin: 0; padding: 0; box-sizing: border-box; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-html { width: ${W}; }
+html { width: ${PAGE_W_MM}mm; }
 body {
-    width: ${W};
+    width: ${PAGE_W_MM}mm;
     margin: 0;
     padding: 0;
     background: #fff; color: #000; font-family: Arial, Helvetica, sans-serif;
     font-size: ${FS}px; line-height: 1.25; font-weight: 600;
 }
-#rcpt { padding: 2.5mm 1mm 7mm 1mm; }
+#rcpt { padding: 2.5mm ${SIDE_PAD_MM}mm 7mm ${SIDE_PAD_MM}mm; }
 .c { text-align: center; }
 .logo { width: ${LW}; max-width: 55mm; max-height: 20mm; height: auto; object-fit: contain; display: block; margin: 0 auto 2px; }
 .fallback-logo { filter: grayscale(1) contrast(1.35); }
@@ -1031,7 +1032,7 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .sum, .tot, .words, .save, .pay, .qr-wrap { break-inside: avoid; page-break-inside: avoid; }
 @media print {
     html, body {
-        width: ${W};
+        width: ${PAGE_W_MM}mm;
         margin: 0;
         padding: 0;
     }
@@ -1133,10 +1134,9 @@ ${qrImg ? `
             printWindow.document.write(html);
             printWindow.document.close();
 
-            // Measure #rcpt.
-            //  - Normal bill: page height = bill height (locked, so a 2nd blank page can never appear)
-            //  - Very long bill (taller than MAX_PAGE_MM): fixed page height, bill is split into pages at row boundaries
-            //    (otherwise the browser shrinks the whole bill to a tiny size)
+            // Page = PAGE_W_MM wide thermal roll.
+            //  - Normal bill: page height = bill height (2nd blank page varaadhu)
+            //  - Very long bill (> MAX_PAGE_MM): fixed-height pages, rows split aagum (shrink aagadhu)
             printWindow.onload = () => {
                 setTimeout(() => {
                     try {
@@ -1146,8 +1146,8 @@ ${qrImg ? `
                         const mm = Math.ceil(h * 25.4 / 96 * 1.03) + 15;
                         const st = pd.createElement('style');
                         st.textContent = mm <= MAX_PAGE_MM
-                            ? `@page { size: ${PAPER}mm ${mm}mm; margin: 0; } html, body { height: ${mm}mm; overflow: hidden; } #rcpt { height: ${mm - 1}mm; overflow: hidden; }`
-                            : `@page { size: ${PAPER}mm ${MAX_PAGE_MM}mm; margin: 0; } html, body { height: auto; overflow: visible; } #rcpt { height: auto; overflow: visible; }`;
+                            ? `@page { size: ${PAGE_W_MM}mm ${mm}mm; margin: 0; } html, body { height: ${mm}mm; overflow: hidden; } #rcpt { height: ${mm - 1}mm; overflow: hidden; }`
+                            : `@page { size: ${PAGE_W_MM}mm ${MAX_PAGE_MM}mm; margin: 0; } html, body { height: auto; overflow: visible; } #rcpt { height: auto; overflow: visible; }`;
                         pd.head.appendChild(st);
                         printWindow.focus();
                         printWindow.print();

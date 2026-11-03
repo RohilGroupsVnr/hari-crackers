@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff — Direct Billing | Hari Crackers</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="../pictures/logo-removebg-preview.png">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Staff — Direct Billing | Hari Crackers</title>
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="icon" type="image/png"
+            href="../pictures/logo-removebg-preview.png">
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+        <style>
         @import url('https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box }
@@ -28,6 +31,7 @@
         body { font-family: Poppins, sans-serif; background: #faf5ff; color: #1f1f1f; display: flex; min-height: 100vh }
         button { font-family: inherit; cursor: pointer }
 
+        /* sidebar */
         .sidebar { width: 260px; background: linear-gradient(180deg, #1a0033, #2d0050 45%, #4a148c); color: #f5e6ff; height: 100vh; position: sticky; top: 0; display: flex; flex-direction: column; border-right: 2px solid rgba(255, 193, 7, .3); flex-shrink: 0; overflow-y: auto; z-index: 1000; box-shadow: 4px 0 20px rgba(45, 0, 80, .3) }
         .sb-brand { padding: 24px 22px 20px; border-bottom: 1px solid rgba(255, 193, 7, .2); display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center }
         .brand-icon { width: 90px; height: 90px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 0 3px rgba(255, 193, 7, .4) }
@@ -52,6 +56,7 @@
         .logout-btn { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: var(--rs); background: linear-gradient(135deg, rgba(255, 193, 7, .15), rgba(106, 27, 154, .15)); border: 2px solid rgba(255, 193, 7, .4); color: var(--y); font-size: .9rem; font-weight: 700; transition: .3s; width: 100% }
         .logout-btn:hover { background: linear-gradient(135deg, #ffc107, #e6a800); color: #2d0050 }
 
+        /* main */
         .main { flex: 1; min-height: 100vh; display: flex; flex-direction: column; min-width: 0 }
         .top { height: 70px; background: #fff; border-bottom: 1px solid var(--bd); padding: 0 30px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100 }
         .top h2 { font-weight: 700; font-size: 1.3rem }
@@ -154,6 +159,7 @@
         .bc { background: #f5e6ff; color: var(--card) }
         .br { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff }
 
+        /* billing layout */
         .grid2 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(340px, 1fr); gap: 20px }
         .lcol { display: grid; gap: 20px; min-width: 0; align-content: start; grid-template-columns: minmax(0, 1fr) }
         .lcol>* { min-width: 0 }
@@ -196,6 +202,7 @@
             .top-right .chip { display: none }
         }
 
+        /* ===== POS fixed screen ===== */
         .catmodal { display: none; position: fixed !important; top: 5vh; left: calc(260px + 4vw); right: 4vw; bottom: 5vh; z-index: 9998; overflow: auto; box-shadow: 0 30px 80px rgba(45, 0, 80, .5); border: 2px solid var(--y) }
         .catmodal.on { display: block !important }
         .catback { display: none; position: fixed; inset: 0; background: rgba(45, 0, 80, .55); z-index: 9997 }
@@ -234,220 +241,299 @@
             .rcol .tr.g { display: none }
         }
     </style>
-</head>
+    </head>
 
-<body>
-    <div class="overlay" id="overlay"></div>
-    <aside class="sidebar" id="sidebar">
-        <div class="sb-brand">
-            <div class="brand-icon"><img src="../pictures/logo-removebg-preview.png" alt="Hari Crackers Logo"></div>
-            <div>
-                <div class="brand-text">Hari <span>Crackers</span></div><span class="brand-sub">Staff Panel</span>
-            </div>
-        </div>
-        <nav class="sb-nav">
-            <div class="nav-label">Staff Menu</div>
-            <a href="billing.html" class="nav-item active"><i class="fas fa-cash-register"></i> Billing</a>
-            <a href="bills-history.html" class="nav-item"><i class="fas fa-file-invoice"></i> Billing History</a>
-            <div class="nav-label" style="margin-top:20px">Inventory</div>
-            <a href="stock-management.html" class="nav-item"><i class="fas fa-warehouse"></i> Stock Management <span
-                    class="badge" id="stockAlertBadge" style="background:#e74c3c;display:none">0</span></a>
-        </nav>
-        <div class="sb-foot">
-            <div class="user-info">
-                <div class="user-avatar">S</div>
+    <body>
+        <div class="overlay" id="overlay"></div>
+        <aside class="sidebar" id="sidebar">
+            <div class="sb-brand">
+                <div class="brand-icon"><img
+                        src="../pictures/logo-removebg-preview.png"
+                        alt="Hari Crackers Logo"></div>
                 <div>
-                    <div class="user-name">Staff</div>
-                    <div class="user-email">staffharicrackers@gmail.com</div>
+                    <div class="brand-text">Hari
+                        <span>Crackers</span></div><span class="brand-sub">Staff
+                        Panel</span>
                 </div>
             </div>
-            <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-        </div>
-    </aside>
-
-    <main class="main">
-        <header class="top">
-            <div style="display:flex;align-items:center;gap:14px">
-                <button class="ham" id="ham"><i class="fas fa-bars"></i></button>
-                <h2 id="pageHeader">Direct Billing <span>— walk-in / shop counter</span></h2>
-            </div>
-            <div class="top-right">
-                <span class="chip">Next Bill: <b id="nextNo">HC---</b></span>
-                <span class="chip" id="clock"></span>
-                <span class="chip">F2 Item · F3 Customer · F4 Received · F7 Products · F8 Clear · F9 Save</span>
-            </div>
-        </header>
-
-        <div class="warn" id="warn">
-            <div class="wi"><i class="fas fa-exclamation-triangle"></i></div>
-            <div class="wc">
-                <div class="wt">⚠️ <strong>Stock is running low!</strong> — <span id="warnCnt">0</span> product(s) need
-                    attention</div>
-                <div class="wl" id="warnList"></div>
-            </div>
-            <button class="wx" onclick="this.parentElement.style.display='none'"><i class="fas fa-times"></i></button>
-        </div>
-
-        <div class="page">
-            <div class="grid2">
-                <div class="lcol">
-                    <div class="panel">
-                        <h3><i class="fas fa-keyboard"></i> Item Entry <small>— item name → Enter → Qty → Enter · ← →
-                                fields · ↓ bill rows</small></h3>
-                        <div class="erow">
-                            <div class="ef"><label>Item Name (F2)</label><input id="eItem" autocomplete="off"
-                                    placeholder="Type item name…">
-                                <div id="sugg"></div>
-                            </div>
-                            <div class="ef"><label>Stock</label>
-                                <div class="ro" id="eStock">—</div>
-                            </div>
-                            <div class="ef"><label>Rate ₹</label><input id="eRate" type="number" min="0"></div>
-                            <div class="ef"><label>Qty</label><input id="eQty" type="number" min="1" value="1"></div>
-                            <div class="ef"><label>Amount</label>
-                                <div class="ro" id="eAmt">₹0</div>
-                            </div>
-                            <button class="btn p addbtn" id="eAdd"><i class="fas fa-plus"></i> Add</button>
-                        </div>
-                        <div id="eInfo"></div>
-                    </div>
-
-                    <div class="panel">
+            <nav class="sb-nav">
+                <div class="nav-label">Staff Menu</div>
+                <a href="billing.html" class="nav-item active"><i
+                        class="fas fa-cash-register"></i> Billing</a>
+                <a href="bills-history.html" class="nav-item"><i
+                        class="fas fa-file-invoice"></i> Billing History</a>
+                <div class="nav-label" style="margin-top:20px">Inventory</div>
+                <a href="stock-management.html" class="nav-item"><i
+                        class="fas fa-warehouse"></i> Stock Management <span
+                        class="badge" id="stockAlertBadge"
+                        style="background:#e74c3c;display:none">0</span></a>
+            </nav>
+            <div class="sb-foot">
+                <div class="user-info">
+                    <div class="user-avatar">S</div>
+                    <div>
+                        <div class="user-name">Staff</div>
                         <div
-                            style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-                            <h3 style="margin:0"><i class="fas fa-shopping-basket"></i> Bill Items (<span
-                                    id="cnt">0</span> qty)</h3>
-                            <div>
-                                <button class="mini" id="catBtn"><i class="fas fa-boxes"></i> Product List <kbd>F7</kbd></button>
-                                <button class="mini" id="manualBtn"><i class="fas fa-plus"></i> Manual Item</button>
-                                <button class="mini" id="heldBtn"><i class="fas fa-pause"></i> Held (<span id="heldCnt">0</span>)</button>
-                                <!-- ✅ EDIT BILL BUTTON -->
-                                <button class="mini" id="editBillBtn" style="background:#fff3cd;color:#856404;border:1px solid #ffeeba;"><i class="fas fa-edit"></i> Edit / Load Bill</button>
+                            class="user-email">staffharicrackers@gmail.com</div>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn"><i
+                        class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="top">
+                <div style="display:flex;align-items:center;gap:14px">
+                    <button class="ham" id="ham"><i
+                            class="fas fa-bars"></i></button>
+                    <h2 id="pageHeader">Direct Billing <span>— walk-in / shop
+                            counter</span></h2>
+                </div>
+                <div class="top-right">
+                    <span class="chip">Next Bill: <b
+                            id="nextNo">HC---</b></span>
+                    <span class="chip" id="clock"></span>
+                    <span class="chip">F2 Item · F3 Customer · F4 Received · F7
+                        Products · F8 Clear · F9 Save</span>
+                </div>
+            </header>
+
+            <div class="warn" id="warn">
+                <div class="wi"><i
+                        class="fas fa-exclamation-triangle"></i></div>
+                <div class="wc">
+                    <div class="wt">⚠️ <strong>Stock is running low!</strong> —
+                        <span id="warnCnt">0</span> product(s) need
+                        attention</div>
+                    <div class="wl" id="warnList"></div>
+                </div>
+                <button class="wx"
+                    onclick="this.parentElement.style.display='none'"><i
+                        class="fas fa-times"></i></button>
+            </div>
+
+            <div class="page">
+                <div class="grid2">
+                    <div class="lcol">
+                        <div class="panel">
+                            <h3><i class="fas fa-keyboard"></i> Item Entry
+                                <small>— item name → Enter → Qty → Enter · ← →
+                                    fields · ↓ bill rows</small></h3>
+                            <div class="erow">
+                                <div class="ef"><label>Item Name
+                                        (F2)</label><input id="eItem"
+                                        autocomplete="off"
+                                        placeholder="Type item name…">
+                                    <div id="sugg"></div>
+                                </div>
+                                <div class="ef"><label>Stock</label>
+                                    <div class="ro" id="eStock">—</div>
+                                </div>
+                                <div class="ef"><label>Rate ₹</label><input
+                                        id="eRate" type="number" min="0"></div>
+                                <div class="ef"><label>Qty</label><input
+                                        id="eQty" type="number" min="1"
+                                        value="1"></div>
+                                <div class="ef"><label>Amount</label>
+                                    <div class="ro" id="eAmt">₹0</div>
+                                </div>
+                                <button class="btn p addbtn" id="eAdd"><i
+                                        class="fas fa-plus"></i> Add</button>
+                            </div>
+                            <div id="eInfo"></div>
+                        </div>
+
+                        <div class="panel">
+                            <div
+                                style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+                                <h3 style="margin:0"><i
+                                        class="fas fa-shopping-basket"></i> Bill
+                                    Items (<span
+                                        id="cnt">0</span> qty)</h3>
+                                <div>
+                                    <button class="mini" id="catBtn"><i
+                                            class="fas fa-boxes"></i> Product
+                                        List <kbd>F7</kbd></button>
+                                    <button class="mini" id="manualBtn"><i
+                                            class="fas fa-plus"></i> Manual
+                                        Item</button>
+                                    <button class="mini" id="heldBtn"><i
+                                            class="fas fa-pause"></i> Held
+                                        (<span id="heldCnt">0</span>)</button>
+                                    <!-- ✅ EDIT BILL BUTTON -->
+                                    <button class="mini" id="editBillBtn"
+                                        style="background:#fff3cd;color:#856404;border:1px solid #ffeeba;"><i
+                                            class="fas fa-edit"></i> Edit / Load
+                                        Bill</button>
+                                </div>
+                            </div>
+                            <p class="empty" id="cartEmpty">Bill is empty. Type
+                                the item name above and press Enter.</p>
+                            <div class="twrap cartwrap" id="cartWrap"
+                                style="display:none">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width:40px">#</th>
+                                            <th>Item</th>
+                                            <th class="n"
+                                                style="width:110px">Qty</th>
+                                            <th class="n"
+                                                style="width:110px">Rate</th>
+                                            <th class="c"
+                                                style="width:90px">Stock
+                                                Left</th>
+                                            <th class="n"
+                                                style="width:110px">Amount</th>
+                                            <th style="width:34px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cart"></tbody>
+                                </table>
                             </div>
                         </div>
-                        <p class="empty" id="cartEmpty">Bill is empty. Type the item name above and press Enter.</p>
-                        <div class="twrap cartwrap" id="cartWrap" style="display:none">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th style="width:40px">#</th>
-                                        <th>Item</th>
-                                        <th class="n" style="width:110px">Qty</th>
-                                        <th class="n" style="width:110px">Rate</th>
-                                        <th class="c" style="width:90px">Stock Left</th>
-                                        <th class="n" style="width:110px">Amount</th>
-                                        <th style="width:34px"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="cart"></tbody>
-                            </table>
+
+                        <div class="panel catmodal" id="catPanel"><button
+                                class="cx" id="catX"><i
+                                    class="fas fa-times"></i></button>
+                            <h3><i class="fas fa-boxes"></i> Product List
+                                <small>— click "Add" for 1 qty (then edit qty in
+                                    bill)</small></h3>
+                            <div class="search"><i
+                                    class="fas fa-search"></i><input id="search"
+                                    placeholder="Filter products…"></div>
+                            <div class="cats" id="cats"></div>
+                            <div id="plist">
+                                <div class="empty">Loading products...</div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="panel catmodal" id="catPanel"><button class="cx" id="catX"><i
-                                class="fas fa-times"></i></button>
-                        <h3><i class="fas fa-boxes"></i> Product List <small>— click "Add" for 1 qty (then edit qty in
-                                bill)</small></h3>
-                        <div class="search"><i class="fas fa-search"></i><input id="search"
-                                placeholder="Filter products…"></div>
-                        <div class="cats" id="cats"></div>
-                        <div id="plist">
-                            <div class="empty">Loading products...</div>
+                    <div class="panel rcol">
+                        <div class="big"><small>GRAND TOTAL</small><b
+                                id="bigTotal">₹0</b></div>
+                        <h3><i class="fas fa-user"></i> Customer Details</h3>
+                        <div class="fld">
+                            <div><label>Customer Name (F3)</label><input
+                                    id="cName"
+                                    placeholder="Walk-in Customer"></div>
+                            <div><label>Phone Number</label>
+                                <div class="row"><input id="cPhone" type="tel"
+                                        maxlength="10" inputmode="numeric"
+                                        placeholder="10-digit mobile number"
+                                        style="flex:1"><button class="mini"
+                                        id="histBtn"><i
+                                            class="fas fa-history"></i>
+                                        History</button></div>
+                            </div>
+                            <div id="hist"></div>
+                            <div class="two">
+                                <div><label>Payment</label><select id="pay">
+                                        <option>Cash</option>
+                                        <option>UPI</option>
+                                        <option>Card</option>
+                                    </select></div>
+                                <div><label>Extra Discount</label>
+                                    <div class="row"><select id="dType"
+                                            style="width:62px">
+                                            <option value="pct">%</option>
+                                            <option value="flat">₹</option>
+                                        </select><input id="dVal" type="number"
+                                            min="0" value="0"></div>
+                                </div>
+                            </div>
+                            <div><label>Amount Received (F4) — blank =
+                                    full</label><input id="recv" type="number"
+                                    min="0"
+                                    placeholder="₹"></div>
+                        </div>
+                        <div class="tot">
+                            <div class="tr"><span>Total Qty</span><strong
+                                    id="sItems">0</strong></div>
+                            <div class="tr"><span>MRP Total</span><strong
+                                    id="sMrp">₹0</strong></div>
+                            <div class="tr"><span>Offer Discount</span><strong
+                                    id="sOffer">₹0</strong></div>
+                            <div class="tr"><span>Extra Discount</span><strong
+                                    id="sExtra">₹0</strong></div>
+                            <div class="tr"><span>Round Off</span><strong
+                                    id="sRound">₹0</strong></div>
+                            <div class="tr g"><span>Grand Total</span><strong
+                                    id="sTotal">₹0</strong></div>
+                            <div class="tr" style="margin:8px 0 0"><span>Change
+                                    / Due</span><span class="chg"
+                                    id="sChg">₹0</span></div>
+                        </div>
+                        <div class="rbtns"><button class="btn p" id="saveBtn"
+                                disabled><i class="fas fa-print"></i> Save
+                                &amp; Print Bill <kbd>F9</kbd></button>
+                            <div class="two"><button class="btn s"
+                                    id="holdBtn"><i class="fas fa-pause"></i>
+                                    Hold
+                                    <kbd>F6</kbd></button><button class="btn s"
+                                    id="clearBtn"><i
+                                        class="fas fa-trash-alt"></i> Clear
+                                    <kbd>F8</kbd></button></div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </main>
 
-                <div class="panel rcol">
-                    <div class="big"><small>GRAND TOTAL</small><b id="bigTotal">₹0</b></div>
-                    <h3><i class="fas fa-user"></i> Customer Details</h3>
-                    <div class="fld">
-                        <div><label>Customer Name (F3)</label><input id="cName" placeholder="Walk-in Customer"></div>
-                        <div><label>Phone Number</label>
-                            <div class="row"><input id="cPhone" type="tel" maxlength="10" inputmode="numeric"
-                                    placeholder="10-digit mobile number" style="flex:1"><button class="mini"
-                                    id="histBtn"><i class="fas fa-history"></i> History</button></div>
-                        </div>
-                        <div id="hist"></div>
-                        <div class="two">
-                            <div><label>Payment</label><select id="pay">
-                                    <option>Cash</option>
-                                    <option>UPI</option>
-                                    <option>Card</option>
-                                </select></div>
-                            <div><label>Extra Discount</label>
-                                <div class="row"><select id="dType" style="width:62px">
-                                        <option value="pct">%</option>
-                                        <option value="flat">₹</option>
-                                    </select><input id="dVal" type="number" min="0" value="0"></div>
-                            </div>
-                        </div>
-                        <div><label>Amount Received (F4) — blank = full</label><input id="recv" type="number" min="0"
-                                placeholder="₹"></div>
-                    </div>
-                    <div class="tot">
-                        <div class="tr"><span>Total Qty</span><strong id="sItems">0</strong></div>
-                        <div class="tr"><span>MRP Total</span><strong id="sMrp">₹0</strong></div>
-                        <div class="tr"><span>Offer Discount</span><strong id="sOffer">₹0</strong></div>
-                        <div class="tr"><span>Extra Discount</span><strong id="sExtra">₹0</strong></div>
-                        <div class="tr"><span>Round Off</span><strong id="sRound">₹0</strong></div>
-                        <div class="tr g"><span>Grand Total</span><strong id="sTotal">₹0</strong></div>
-                        <div class="tr" style="margin:8px 0 0"><span>Change / Due</span><span class="chg"
-                                id="sChg">₹0</span></div>
-                    </div>
-                    <div class="rbtns"><button class="btn p" id="saveBtn" disabled><i class="fas fa-print"></i> Save
-                            &amp; Print Bill <kbd>F9</kbd></button>
-                        <div class="two"><button class="btn s" id="holdBtn"><i class="fas fa-pause"></i> Hold
-                                <kbd>F6</kbd></button><button class="btn s" id="clearBtn"><i
-                                    class="fas fa-trash-alt"></i> Clear <kbd>F8</kbd></button></div>
-                    </div>
+        <div class="catback" id="catBack"></div>
+        <div class="lb" id="lb"><button class="x" id="lbX"><i
+                    class="fas fa-times"></i></button><img id="lbImg" src
+                alt>
+            <div class="cap" id="lbCap">Product</div>
+        </div>
+
+        <div class="modal" id="rmModal">
+            <div class="mbox" style="text-align:center">
+                <h3>Remove Item?</h3>
+                <p id="rmMsg" style="color:#555;font-size:.9rem"></p>
+                <div class="mact"><button class="bc"
+                        id="rmNo">Cancel</button><button class="br"
+                        id="rmYes">Remove</button>
                 </div>
             </div>
         </div>
-    </main>
 
-    <div class="catback" id="catBack"></div>
-    <div class="lb" id="lb"><button class="x" id="lbX"><i class="fas fa-times"></i></button><img id="lbImg" src=""
-            alt="">
-        <div class="cap" id="lbCap">Product</div>
-    </div>
-
-    <div class="modal" id="rmModal">
-        <div class="mbox" style="text-align:center">
-            <h3>Remove Item?</h3>
-            <p id="rmMsg" style="color:#555;font-size:.9rem"></p>
-            <div class="mact"><button class="bc" id="rmNo">Cancel</button><button class="br" id="rmYes">Remove</button>
+        <div class="modal" id="heldModal">
+            <div class="mbox">
+                <h3>Held Bills</h3>
+                <div id="heldList"></div>
+                <div class="mact"><button class="bc"
+                        id="heldClose">Close</button></div>
             </div>
         </div>
-    </div>
 
-    <div class="modal" id="heldModal">
-        <div class="mbox">
-            <h3>Held Bills</h3>
-            <div id="heldList"></div>
-            <div class="mact"><button class="bc" id="heldClose">Close</button></div>
-        </div>
-    </div>
-
-    <!-- ✅ EDIT BILL MODAL -->
-    <div class="modal" id="editModal">
-        <div class="mbox">
-            <h3>Edit / Load Bill</h3>
-            <p style="font-size:0.8rem;color:#666;margin-bottom:12px;">Enter the Bill Number (e.g., HC168) to load and edit the items. Stock will be adjusted automatically.</p>
-            <input type="text" id="editBillInput" placeholder="Enter Bill No (e.g., HC168)" style="width:100%;padding:10px;border:2px solid var(--bds);border-radius:8px;margin-bottom:12px;text-transform:uppercase;font-weight:700;">
-            <div id="editError" style="color:#e74c3c;font-size:0.8rem;display:none;margin-bottom:10px;"></div>
-            <div class="mact">
-                <button class="bc" id="editCancelBtn">Cancel</button>
-                <button class="br" id="editLoadBtn" style="background:var(--card);">Load Bill</button>
+        <!-- ✅ EDIT BILL MODAL -->
+        <div class="modal" id="editModal">
+            <div class="mbox">
+                <h3>Edit / Load Bill</h3>
+                <p style="font-size:0.8rem;color:#666;margin-bottom:12px;">Enter
+                    the Bill Number (e.g., HC168) to load and edit the items.
+                    Stock will be adjusted automatically.</p>
+                <input type="text" id="editBillInput"
+                    placeholder="Enter Bill No (e.g., HC168)"
+                    style="width:100%;padding:10px;border:2px solid var(--bds);border-radius:8px;margin-bottom:12px;text-transform:uppercase;font-weight:700;">
+                <div id="editError"
+                    style="color:#e74c3c;font-size:0.8rem;display:none;margin-bottom:10px;"></div>
+                <div class="mact">
+                    <button class="bc" id="editCancelBtn">Cancel</button>
+                    <button class="br" id="editLoadBtn"
+                        style="background:var(--card);">Load Bill</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="toast" class="toast"></div>
+        <div id="toast" class="toast"></div>
 
-    <script type="importmap">
+        <script type="importmap">
 {"imports":{"firebase/app":"https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js","firebase/firestore":"https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js","firebase/auth":"https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"}}
 </script>
-    <script type="module">
+        <script type="module">
         import { initializeApp } from "firebase/app";
         import { getFirestore, collection, onSnapshot, query, orderBy, doc, serverTimestamp, where, limit, getDocs, writeBatch, runTransaction, increment, setDoc, deleteDoc, enableIndexedDbPersistence } from "firebase/firestore";
         import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
@@ -475,7 +561,7 @@
         const inr = n => '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 });
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const LOGO = '../pictures/logo-removebg-preview.png', K = 'haricrackers_pos_draft_v2', KH = 'haricrackers_pos_held_v2';
-        const PAPER = 80;        // thermal paper width in mm: 80 or 58
+        const PAPER = 80; // thermal paper width in mm: 80 or 58
         // ===== THERMAL ROLL SETTINGS (A4 illa, roll paper size) =====
         const PAGE_W_MM = 76;     // bill page width (mm). 76 = ungaloda munnadi sari-aa print aana size. Innum full venumna 78 -> 80 try pannunga
         const SIDE_PAD_MM = 2;    // left/right gap (mm). Edge-la text cut aana 3-4 aakkunga
@@ -483,8 +569,17 @@
         let products = [], bill = [], cat = 'All', hl = 0, saving = false, pendingRm = null;
 
         // ✅ EDIT MODE STATE
-        let editingOrder = null;
+        let editingOrder = null;   // { id, orderId, items, ... } if editing
 
+        // ---------- edit-mode stock helpers ----------
+        // Stock is only adjusted for walk-in bills (or bills flagged stockDeducted)
+        const stockTracked = o => !!o && (o.stockDeducted === true || o.source === 'walk-in');
+        const itemQty = x => Number(x.qty ?? x.quantity) || 0;
+        const oldQtyOf = id => (editingOrder && stockTracked(editingOrder))
+            ? (editingOrder.items || []).filter(x => x.productId === id && !x.isManual).reduce((s, x) => s + itemQty(x), 0)
+            : 0;
+
+        // live bill -> shared with Stock Management ("In Bill" column)
         const CID = (() => { try { let c = sessionStorage.getItem('hc_cid'); if (!c) { c = 'b' + Math.random().toString(36).slice(2, 9); sessionStorage.setItem('hc_cid', c); } return c; } catch (e) { return 'b' + Date.now(); } })();
         let liveT;
         function publishLive() {
@@ -502,21 +597,26 @@
         function toast(m, t = 'info') { const e = $('toast'); e.textContent = m; e.className = 'toast show ' + t; clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove('show'), 3000); }
         setInterval(() => $('clock').textContent = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }), 1000);
 
+        // ---------- products ----------
         const stockOf = p => typeof p.stockQty === 'number' ? p.stockQty : null;
-        const isOut = p => stockOf(p) !== null ? stockOf(p) <= 0 : p.inStock === false;
+        // stock available for THIS bill: in edit mode the old bill's qty is added back
+        const availOf = p => {
+            const s = stockOf(p);
+            if (s === null) return null;
+            if (editingOrder && !stockTracked(editingOrder)) return null;
+            return s + oldQtyOf(p.id);
+        };
+        const isOut = p => { const a = availOf(p); return a !== null ? a <= 0 : p.inStock === false; };
         const filtered = () => { const t = $('search').value.trim().toLowerCase(); return products.filter(p => (cat === 'All' || (p.category || 'Others') === cat) && (!t || (p.name || '').toLowerCase().includes(t))); };
         const pickable = () => filtered().filter(p => !isOut(p));
 
         onSnapshot(query(collection(db, 'products'), orderBy('orderIndex', 'asc')), s => {
             products = s.docs.map(d => ({ id: d.id, ...d.data() }));
             renderCats(); renderProducts(); renderWarn(); refreshStockViews();
-            const pb = $('productBadge'); if (pb) pb.textContent = s.size;
             const low = products.filter(p => stockOf(p) !== null && stockOf(p) <= (p.lowStockThreshold || 5)).length;
             const sb = $('stockAlertBadge');
             if (sb) { sb.textContent = low; sb.style.display = low ? 'inline-block' : 'none'; }
         }, e => toast('⚠️ Error loading products', 'error'));
-
-        onSnapshot(collection(db, 'orders'), s => { const ob = $('orderBadge'); if (ob) ob.textContent = s.size; });
         onSnapshot(doc(db, 'settings', 'orderCounter'), s => $('nextNo').textContent = 'HC' + String((s.exists() ? s.data().lastOrderNumber || 0 : 0) + 1).padStart(3, '0'));
 
         function renderCats() {
@@ -528,7 +628,7 @@
             const old = document.querySelector('#plistWrap')?.scrollTop || 0, list = filtered(), pk = pickable(), hid = pk[hl]?.id;
             if (!list.length) { $('plist').innerHTML = '<div class="empty">No products found</div>'; return; }
             $('plist').innerHTML = `<div class="twrap" id="plistWrap"><table><thead><tr><th>Product</th><th class="n">Price</th><th class="n">Stock</th><th class="n">Action</th></tr></thead><tbody>` + list.map(p => {
-                const s0 = stockOf(p), out = isOut(p), q = bill.find(b => b.id === p.id)?.qty || 0, th = p.lowStockThreshold || 5, s = s0 === null ? null : s0 - q;
+                const s0 = availOf(p), out = isOut(p), q = bill.find(b => b.id === p.id)?.qty || 0, th = p.lowStockThreshold || 5, s = s0 === null ? null : s0 - q;
                 const tag = out ? '<span class="stk ou">Out of Stock</span>' : (s !== null && s <= 0) ? '<span class="stk ou">All in bill</span>' : (s !== null && s <= th) ? `<span class="stk lo">${s} left</span>` : `<span class="stk in">${s !== null ? s + ' In Stock' : 'In Stock'}</span>`;
                 return `<tr data-id="${p.id}" class="${out ? 'out' : ''} ${q ? 'incart' : ''} ${p.id === hid ? 'kb' : ''}"><td><div class="pc"><img class="pimg" src="${esc(p.imageUrl || LOGO)}" data-name="${esc(p.name)}" onerror="this.src='${LOGO}'"><span>${esc(p.name || 'Unnamed')}</span></div></td><td class="n">₹${p.price || 0}</td><td class="n">${tag}</td><td class="n">${q ? `<span class="qbadge" title="Click to reduce">${q}</span>` : ''}<button class="addb" ${out || (s !== null && s <= 0) ? 'disabled' : ''}><i class="fas fa-plus"></i> Add</button></td></tr>`;
             }).join('') + '</tbody></table></div>';
@@ -549,27 +649,30 @@
             if (e.target.closest('.addb')) addProduct(products.find(p => p.id === tr.dataset.id));
         };
 
-        const leftOf = i => { if (i.manual) return null; const p = products.find(x => x.id === i.id); const s = p ? stockOf(p) : null; return s === null ? null : s - i.qty; };
+        // ---------- live stock helpers ----------
+        const leftOf = i => { if (i.manual) return null; const p = products.find(x => x.id === i.id); const s = p ? availOf(p) : null; return s === null ? null : s - i.qty; };
         const stlHtml = i => { const l = leftOf(i); return l === null ? '—' : `<span class="stk ${l < 0 ? 'ou' : l <= 5 ? 'lo' : 'in'}">${l}</span>`; };
         function refreshStockViews() {
             document.querySelectorAll('#cart tr').forEach(tr => { const it = bill[+tr.dataset.i]; if (it) tr.querySelector('.stl').innerHTML = stlHtml(it); });
-            if (sel) { const fresh = products.find(p => p.id === sel.id); if (fresh) { sel = fresh; const s = stockOf(fresh); $('eStock').textContent = s !== null ? s : 'In Stock'; } }
+            if (sel) { const fresh = products.find(p => p.id === sel.id); if (fresh) { sel = fresh; const s = availOf(fresh); $('eStock').textContent = s !== null ? s : 'In Stock'; } }
             entryInfo();
         }
         function entryInfo() {
             const b = $('eInfo'); if (!sel) { b.innerHTML = ''; return; }
-            const s = stockOf(sel); if (s === null) { b.innerHTML = ''; return; }
+            const s = availOf(sel); if (s === null) { b.innerHTML = ''; return; }
             const inBill = bill.find(x => x.id === sel.id)?.qty || 0, q = parseInt($('eQty').value, 10) || 0, left = s - inBill - q;
             b.innerHTML = `📦 Stock: <b>${s}</b> &nbsp;|&nbsp; In Bill: <b>${inBill}</b> &nbsp;|&nbsp; After Adding: <b class="${left < 0 ? 'neg' : 'pos'}">${left}</b>`;
         }
 
+        // ---------- lightbox ----------
         function openLb(src, n) { $('lbImg').src = src; $('lbCap').textContent = n || 'Product'; $('lb').classList.add('on'); }
         const closeLb = () => $('lb').classList.remove('on');
         $('lb').onclick = e => { if (e.target.id === 'lb' || e.target.closest('#lbX')) closeLb(); };
 
+        // ---------- bill ----------
         function addProduct(p) {
             if (!p) return;
-            const s = stockOf(p), ex = bill.find(b => b.id === p.id);
+            const s = availOf(p), ex = bill.find(b => b.id === p.id);
             if (isOut(p)) return toast('Out of stock: ' + p.name, 'error');
             if (s !== null && (ex ? ex.qty : 0) + 1 > s) return toast(`Only ${s} in stock: ${p.name}`, 'error');
             if (ex) ex.qty++; else bill.push({ id: p.id, name: p.name || 'Unnamed', price: Number(p.price) || 0, oldPrice: Number(p.oldPrice) || Number(p.price) || 0, qty: 1, included: true });
@@ -615,7 +718,7 @@
         $('cart').oninput = e => { const k = e.target.dataset.k; if (!k) return; const tr = e.target.closest('tr'), it = bill[+tr.dataset.i]; it[k] = Math.max(0, parseFloat(e.target.value) || 0); rowSync(tr, it); };
         $('cart').onchange = e => {
             const k = e.target.dataset.k; if (!k) return; const tr = e.target.closest('tr'), it = bill[+tr.dataset.i]; let v = parseFloat(e.target.value) || 0;
-            if (k === 'qty') { v = Math.max(1, Math.floor(v)); const s = it.manual ? null : stockOf(products.find(p => p.id === it.id) || {}); if (s !== null && v > s) { v = s; toast('Stock limit: ' + s, 'error'); } }
+            if (k === 'qty') { v = Math.max(1, Math.floor(v)); const s = it.manual ? null : availOf(products.find(p => p.id === it.id) || {}); if (s !== null && v > s) { v = s; toast('Stock limit: ' + s, 'error'); } }
             it[k] = Math.max(0, v); e.target.value = it[k]; rowSync(tr, it); renderProducts();
         };
         $('cart').onkeydown = e => {
@@ -628,12 +731,15 @@
         $('cart').onfocusin = e => { if (e.target.tagName === 'INPUT') e.target.select(); };
         ['dVal', 'dType', 'recv', 'pay', 'cName'].forEach(i => $(i).addEventListener('input', () => { updateTotals(); persist(); }));
 
+        // ---------- persist / hold ----------
         const snap = () => ({ bill, name: $('cName').value, phone: $('cPhone').value, dType: $('dType').value, dVal: $('dVal').value, pay: $('pay').value, recv: $('recv').value });
         function load(s) { bill = Array.isArray(s.bill) ? s.bill : []; $('cName').value = s.name || ''; $('cPhone').value = s.phone || ''; $('dType').value = s.dType || 'pct'; $('dVal').value = s.dVal || 0; $('pay').value = s.pay || 'Cash'; $('recv').value = s.recv || ''; renderCart(); }
 
         function persist() {
+            // Edit mode: never save as draft (a page reload would otherwise reopen the old bill as a NEW bill and deduct stock again)
+            if (editingOrder) return;
             try { localStorage.setItem(K, JSON.stringify(snap())); } catch (e) { }
-            if (!editingOrder) publishLive();
+            publishLive();
         }
 
         const held = () => { try { return JSON.parse(localStorage.getItem(KH)) || []; } catch (e) { return []; } };
@@ -649,7 +755,11 @@
         };
         $('heldBtn').onclick = () => { renderHeld(); $('heldModal').classList.add('on'); };
         $('heldClose').onclick = () => $('heldModal').classList.remove('on');
-        function hold() { if (!bill.length) return toast('Bill empty', 'info'); const h = held(); h.push({ ...snap(), at: new Date().toLocaleTimeString('en-IN') }); localStorage.setItem(KH, JSON.stringify(h)); reset(); renderHeld(); toast('⏸ Bill held', 'success'); }
+        function hold() {
+            if (editingOrder) return toast('Edit mode-la Hold panna mudiyaadhu. Update Bill illa Clear (F8) pannunga', 'error');
+            if (!bill.length) return toast('Bill empty', 'info');
+            const h = held(); h.push({ ...snap(), at: new Date().toLocaleTimeString('en-IN') }); localStorage.setItem(KH, JSON.stringify(h)); reset(); renderHeld(); toast('⏸ Bill held', 'success');
+        }
 
         function reset() {
             editingOrder = null;
@@ -662,8 +772,9 @@
         }
 
         $('holdBtn').onclick = hold;
-        $('clearBtn').onclick = () => { if (bill.length && !confirm('Clear the current bill?')) return; reset(); };
+        $('clearBtn').onclick = () => { if ((bill.length || editingOrder) && !confirm(editingOrder ? 'Cancel editing this bill?' : 'Clear the current bill?')) return; reset(); };
 
+        // ---------- customer history ----------
         async function lookup() {
             const ph = $('cPhone').value.trim(), nm = $('cName').value.trim(), h = $('hist');
             if (!ph && !nm) return toast('Customer Name or Phone number required', 'error');
@@ -685,14 +796,18 @@
         // ✅ EDIT BILL LOGIC
         // ==========================================
         $('editBillBtn').onclick = () => {
-            if (bill.length > 0 && !confirm('Current bill-la items irukku. Adha clear panni edit pannalama?')) return;
+            if (bill.length > 0 || editingOrder) {
+                if (!confirm('Current bill-la items irukku. Adha clear panni edit pannalama?')) return;
+                reset();
+            }
             $('editModal').classList.add('on');
             $('editBillInput').value = '';
             $('editError').style.display = 'none';
             $('editBillInput').focus();
         };
 
-        $('editCancelBtn').onclick = () => $('editModal').classList.remove('on');
+        $('editCancelBtn').onclick = () => { $('editModal').classList.remove('on'); $('eItem').focus(); };
+        $('editBillInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('editLoadBtn').click(); } });
 
         $('editLoadBtn').onclick = async () => {
             const orderId = $('editBillInput').value.trim().toUpperCase();
@@ -715,35 +830,44 @@
                 const d = snap.docs[0];
                 editingOrder = { id: d.id, ...d.data() };
 
-                bill = (editingOrder.items || []).map(i => ({
-                    id: i.productId || ('manual-' + Math.random()),
-                    name: i.name,
-                    price: Number(i.price) || 0,
-                    oldPrice: Number(i.oldPrice) || Number(i.price) || 0,
-                    qty: Number(i.qty) || 1,
-                    included: true,
-                    manual: !!i.isManual
-                }));
+                // Load items to bill
+                bill = (editingOrder.items || []).map(i => {
+                    const pid = i.productId || '';
+                    return {
+                        id: pid || ('manual-' + Math.random().toString(36).slice(2, 8)),
+                        name: i.name || i.productName || 'Item',
+                        price: Number(i.price) || 0,
+                        oldPrice: Number(i.oldPrice) || Number(i.price) || 0,
+                        qty: itemQty(i) || 1,
+                        included: true,
+                        manual: !!i.isManual || !pid
+                    };
+                });
 
+                // Load customer details
                 $('cName').value = editingOrder.customerName || '';
                 $('cPhone').value = editingOrder.customerPhone || '';
                 $('pay').value = editingOrder.paymentMethod || 'Cash';
                 $('recv').value = editingOrder.amountReceived || '';
 
-                if (editingOrder.discount) {
-                    $('dType').value = 'flat';
-                    $('dVal').value = editingOrder.discount;
-                }
+                // Load discount (always reset, so an old discount never sticks)
+                $('dType').value = 'flat';
+                $('dVal').value = Number(editingOrder.discount) || 0;
 
                 renderCart();
                 $('editModal').classList.remove('on');
 
-                document.getElementById('pageHeader').innerHTML = `✏️ Editing Bill <span>— ${orderId}</span>`;
+                // Change Header & Button text to indicate Edit Mode
+                document.getElementById('pageHeader').innerHTML = `✏️ Editing Bill <span>— ${esc(orderId)}</span>`;
                 $('saveBtn').innerHTML = `<i class="fas fa-save"></i> Update Bill <kbd>F9</kbd>`;
 
-                toast('✅ Bill ' + orderId + ' Loaded for Edit', 'info');
+                toast(stockTracked(editingOrder)
+                    ? '✅ Bill ' + orderId + ' Loaded for Edit'
+                    : 'ℹ️ Bill ' + orderId + ' loaded. Stock was not deducted for this order, so stock will not change', 'info');
+                $('eItem').focus();
             } catch (e) {
                 console.error(e);
+                editingOrder = null;
                 $('editError').textContent = '⚠️ Error: ' + e.message;
                 $('editError').style.display = 'block';
             } finally {
@@ -757,20 +881,14 @@
             const t = calc(); if (!t.a.length || saving) return;
             const recv = $('recv').value === '' ? t.grand : parseFloat($('recv').value) || 0, name = $('cName').value.trim() || 'Walk-in Customer', phone = $('cPhone').value.trim();
 
-            for (const i of t.a) {
-                if (i.manual) continue;
-                const p = products.find(x => x.id === i.id);
-                const s = stockOf(p || {});
-                if (s === null) continue;
-
-                let oldQty = 0;
-                if (editingOrder) {
-                    const old = (editingOrder.items || []).find(x => x.productId === i.id);
-                    oldQty = old ? Number(old.qty) || 0 : 0;
-                }
-                const needed = i.qty - oldQty;
-                if (needed > 0 && s < needed) {
-                    return toast(`Stock insufficient: ${i.name} (need ${needed} more, only ${s} available)`, 'error');
+            // STOCK VALIDATION (edit mode: the old bill's qty is already added back inside availOf)
+            const want = {};
+            t.a.forEach(i => { if (!i.manual) want[i.id] = (want[i.id] || 0) + i.qty; });
+            for (const pid of Object.keys(want)) {
+                const p = products.find(x => x.id === pid); if (!p) continue;
+                const avail = availOf(p); if (avail === null) continue;
+                if (want[pid] > avail) {
+                    return toast(`Stock insufficient: ${p.name} (need ${want[pid]}, only ${avail} available)`, 'error');
                 }
             }
 
@@ -778,25 +896,30 @@
             try {
                 const now = new Date(), pay = $('pay').value, batch = writeBatch(db), lows = [];
 
+                // STOCK UPDATES
                 if (editingOrder) {
-                    const oldMap = {};
-                    (editingOrder.items || []).forEach(i => { if (i.isManual) return; oldMap[i.productId] = (oldMap[i.productId] || 0) + (Number(i.qty) || 0); });
-                    const newMap = {};
-                    t.a.forEach(i => { if (i.manual) return; newMap[i.id] = (newMap[i.id] || 0) + i.qty; });
+                    // EDIT MODE — apply only the difference (skipped for orders whose stock was never deducted)
+                    if (stockTracked(editingOrder)) {
+                        const oldMap = {};
+                        (editingOrder.items || []).forEach(i => { if (i.isManual || !i.productId) return; oldMap[i.productId] = (oldMap[i.productId] || 0) + itemQty(i); });
+                        const newMap = {};
+                        t.a.forEach(i => { if (i.manual) return; newMap[i.id] = (newMap[i.id] || 0) + i.qty; });
 
-                    const allIds = new Set([...Object.keys(oldMap), ...Object.keys(newMap)]);
-                    for (const pid of allIds) {
-                        const oldQ = oldMap[pid] || 0, newQ = newMap[pid] || 0, diff = newQ - oldQ;
-                        if (diff === 0) continue;
+                        const allIds = new Set([...Object.keys(oldMap), ...Object.keys(newMap)]);
+                        for (const pid of allIds) {
+                            const oldQ = oldMap[pid] || 0, newQ = newMap[pid] || 0, diff = newQ - oldQ;
+                            if (diff === 0) continue;
 
-                        const p = products.find(x => x.id === pid); if (!p) continue;
-                        const before = typeof p.stockQty === 'number' ? p.stockQty : 0, after = Math.max(0, before - diff), th = p.lowStockThreshold || 5;
+                            const p = products.find(x => x.id === pid); if (!p) continue;
+                            const before = typeof p.stockQty === 'number' ? p.stockQty : 0, after = Math.max(0, before - diff), th = p.lowStockThreshold || 5;
 
-                        batch.update(doc(db, 'products', pid), { stockQty: increment(-diff), inStock: after > 0, updatedAt: now.toISOString(), lastSoldAt: now.toISOString() });
-                        batch.set(doc(collection(db, 'stockMovements')), { productId: pid, productName: p.name, type: diff > 0 ? 'sale' : 'return', change: -diff, before, after, note: 'Bill edit ' + editingOrder.orderId, by: auth.currentUser?.email || 'unknown', date: now.toISOString(), createdAt: serverTimestamp() });
-                        if (after <= th) lows.push(`${p.name} (${after <= 0 ? 'OUT' : after + ' left'})`);
+                            batch.update(doc(db, 'products', pid), { stockQty: increment(-diff), inStock: after > 0, updatedAt: now.toISOString(), lastSoldAt: now.toISOString() });
+                            batch.set(doc(collection(db, 'stockMovements')), { productId: pid, productName: p.name, type: diff > 0 ? 'sale' : 'return', change: -diff, before, after, note: 'Bill edit ' + editingOrder.orderId, by: auth.currentUser?.email || 'unknown', date: now.toISOString(), createdAt: serverTimestamp() });
+                            if (after <= th) lows.push(`${p.name} (${after <= 0 ? 'OUT' : after + ' left'})`);
+                        }
                     }
                 } else {
+                    // NEW BILL — full stock deduct
                     for (const i of t.a) {
                         if (i.manual) continue; const p = products.find(x => x.id === i.id); if (!p) continue;
                         const before = typeof p.stockQty === 'number' ? p.stockQty : 0, after = Math.max(0, before - i.qty), th = p.lowStockThreshold || 5;
@@ -815,6 +938,7 @@
                 };
 
                 let orderId;
+                const wasEdit = !!editingOrder, origDate = editingOrder?.orderDate || null;
                 if (editingOrder) {
                     orderId = editingOrder.orderId;
                     batch.update(doc(db, 'orders', editingOrder.id), { ...orderPayload, editedAt: now.toISOString(), editedBy: auth.currentUser?.email || 'unknown', editCount: (editingOrder.editCount || 0) + 1 });
@@ -827,9 +951,9 @@
 
                 await batch.commit();
 
-                printInvoice({ orderId, name, phone, pay, items: t.a, t, recv, date: now.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }), isEdit: !!editingOrder });
+                printInvoice({ orderId, name, phone, pay, items: t.a, t, recv, origDate, isEdit: wasEdit });
 
-                toast(`✅ Bill ${orderId} ${editingOrder ? 'updated' : 'saved'}`, 'success');
+                toast(`✅ Bill ${orderId} ${wasEdit ? 'updated' : 'saved'}`, 'success');
 
                 setTimeout(() => { reset(); }, 800);
 
@@ -839,7 +963,7 @@
         }
         $('saveBtn').onclick = save;
 
-        // ---------- thermal receipt ----------
+        // ---------- thermal receipt (80mm / 58mm, black & white) ----------
         const SHOP = {
             name: 'HARI CRACKERS',
             address: '2/8A GANDHI NAGAR RANJANKUDI THEVAIYUR NORTH PERAMBALUR (D.T) PIN CODE:621115',
@@ -891,6 +1015,7 @@
             }));
         }
 
+        // ---------- amount in words (Indian system) ----------
         function inWords(n) {
             const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
             const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
@@ -908,11 +1033,12 @@
 
         async function printInvoice(o) {
             const is58 = PAPER === 58;
-            const FS = is58 ? 10.5 : 11.5;
             const LW = '48%'; // logo width (% of bill)
 
             const N = n => Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            const now = new Date();
+            // edited bills keep their ORIGINAL date & time
+            let now = o.origDate ? new Date(o.origDate) : new Date();
+            if (isNaN(now.getTime())) now = new Date();
             const dStr = now.toLocaleDateString('en-GB');
             const tStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
             const cashier = (auth.currentUser?.email || '').split('@')[0] || 'Staff';
@@ -943,13 +1069,13 @@
                 } catch (err) { console.error('QR generation failed:', err); resolve(null); }
             });
 
+            // MRP column is hidden on the printed bill (bigger, clearer text); MRP Total / Offer Discount lines still show the savings
             const rows = (o.items || []).map((i, x) => {
-                const qty = Number(i.qty || 0), rate = Number(i.price || 0), amount = qty * rate, mrp = Number(i.oldPrice || 0);
+                const qty = Number(i.qty || 0), rate = Number(i.price || 0), amount = qty * rate;
                 return `
 <tr class="it-row">
     <td class="it-sn">${x + 1}</td>
     <td class="it-name">${esc(i.name || '')}</td>
-    <td class="it-mrp">${mrp > 0 ? N(mrp) : ''}</td>
     <td class="it-qty">${qty}</td>
     <td class="it-rate">${N(rate)}</td>
     <td class="it-amt">${N(amount)}</td>
@@ -971,71 +1097,63 @@ body {
     margin: 0;
     padding: 0;
     background: #fff; color: #000; font-family: Arial, Helvetica, sans-serif;
-    font-size: ${FS}px; line-height: 1.25; font-weight: 600;
+    font-size: ${is58 ? 11.5 : 13}px; line-height: 1.3; font-weight: 700;
 }
 #rcpt { padding: 2.5mm ${SIDE_PAD_MM}mm 7mm ${SIDE_PAD_MM}mm; }
 .c { text-align: center; }
 .logo { width: ${LW}; max-width: 55mm; max-height: 20mm; height: auto; object-fit: contain; display: block; margin: 0 auto 2px; }
 .fallback-logo { filter: grayscale(1) contrast(1.35); }
-.shop { font-size: ${is58 ? 16 : 19}px; font-weight: 900; letter-spacing: .3px; line-height: 1.05; margin-top: 1px; }
-.tag { font-size: ${is58 ? 9 : 10}px; font-weight: 800; letter-spacing: .4px; margin-top: 2px; }
-.addr { font-size: ${is58 ? 8.5 : 9.5}px; font-weight: 700; line-height: 1.25; margin-top: 3px; }
-.ph { font-size: ${is58 ? 9 : 10}px; font-weight: 900; margin-top: 3px; }
-.gst { font-size: ${is58 ? 8 : 9}px; font-weight: 700; margin-top: 2px; }
-.dash { border-top: 1px dashed #000; margin: 4px 0; }
-.sol { border-top: 1.4px solid #000; margin: 5px 0; }
-.dbl { border-top: 2px double #000; margin: 5px 0; }
-.bill-no-wrap { text-align: center; margin: 3px 0; }
-.bill-no { display: inline-block; font-size: ${is58 ? 11 : 13}px; font-weight: 900; letter-spacing: 1.5px; padding: 2px 10px; border: 1.5px solid #000; }
-.meta { font-size: ${is58 ? 9.5 : 10.5}px; margin: 4px 0; }
-.meta .ln { display: flex; justify-content: space-between; align-items: flex-start; gap: 7px; margin: 2px 0; line-height: 1.35; }
+.shop { font-size: ${is58 ? 17 : 21}px; font-weight: 900; letter-spacing: .3px; line-height: 1.05; margin-top: 1px; }
+.tag { font-size: ${is58 ? 10.5 : 12}px; font-weight: 800; letter-spacing: .4px; margin-top: 2px; }
+.addr { font-size: ${is58 ? 9.5 : 11}px; font-weight: 800; line-height: 1.3; margin-top: 3px; }
+.ph { font-size: ${is58 ? 10.5 : 12}px; font-weight: 900; margin-top: 3px; }
+.gst { font-size: ${is58 ? 9.5 : 11}px; font-weight: 800; margin-top: 2px; }
+.dash { border-top: 1.2px dashed #000; margin: 5px 0; }
+.sol { border-top: 1.6px solid #000; margin: 6px 0; }
+.bill-no-wrap { text-align: center; margin: 4px 0; }
+.bill-no { display: inline-block; font-size: ${is58 ? 13 : 16}px; font-weight: 900; letter-spacing: 1.5px; padding: 2px 10px; border: 2px solid #000; }
+.meta { font-size: ${is58 ? 10.5 : 12}px; margin: 4px 0; }
+.meta .ln { display: flex; justify-content: space-between; align-items: flex-start; gap: 7px; margin: 3px 0; line-height: 1.35; }
 .meta .ln > span { min-width: 0; }
 .meta b { font-weight: 900; }
 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.it { width: 100%; font-size: ${is58 ? 9 : 10.5}px; margin-top: 2px; }
-.it thead th { font-size: ${is58 ? 8 : 9}px; font-weight: 900; text-transform: uppercase; letter-spacing: .1px; padding: 3px 1px; border-top: 1.3px solid #000; border-bottom: 1.3px solid #000; text-align: right; white-space: nowrap; }
-.it-sn-h { width: 6% !important; text-align: left !important; }
-.it-name-h { width: 34% !important; text-align: left !important; }
-.it-mrp-h { width: 13% !important; }
-.it-qty-h { width: 9% !important; text-align: center !important; }
-.it-rate-h { width: 18% !important; }
-.it-amt-h { width: 20% !important; }
-.it tbody td { padding: 3px 1px; vertical-align: top; line-height: 1.3; }
-.it-sn { width: 6%; text-align: left; padding-left: 1px !important; font-weight: 700; }
-.it-name { width: 34%; text-align: left; padding-right: 3px !important; word-break: normal; overflow-wrap: anywhere; font-weight: 800; }
-.it-mrp { width: 13%; text-align: right; font-size: ${is58 ? 8 : 9}px; color: #555; text-decoration: line-through; font-weight: 600; }
-.it-qty { width: 9%; text-align: center; font-weight: 800; }
-.it-rate { width: 18%; text-align: right; font-weight: 700; }
+.it { width: 100%; font-size: ${is58 ? 11 : 12.5}px; margin-top: 2px; }
+.it thead th { font-size: ${is58 ? 9 : 10.5}px; font-weight: 900; text-transform: uppercase; padding: 4px 1px; border-top: 1.6px solid #000; border-bottom: 1.6px solid #000; text-align: right; white-space: nowrap; }
+.it-sn-h { width: 7%; text-align: left !important; }
+.it-name-h { width: 45%; text-align: left !important; }
+.it-qty-h { width: 10%; text-align: center !important; }
+.it-rate-h { width: 18%; }
+.it-amt-h { width: 20%; }
+.it tbody td { padding: 4px 1px; vertical-align: top; line-height: 1.3; }
+.it-sn { width: 7%; text-align: left; padding-left: 1px !important; font-weight: 800; }
+.it-name { width: 45%; text-align: left; padding-right: 3px !important; word-break: normal; overflow-wrap: anywhere; font-weight: 900; font-size: ${is58 ? 11.5 : 13}px; }
+.it-qty { width: 10%; text-align: center; font-weight: 900; }
+.it-rate { width: 18%; text-align: right; font-weight: 800; }
 .it-amt { width: 20%; text-align: right; font-weight: 900; }
 .it tbody tr { border-bottom: 1px dotted #000; break-inside: avoid; page-break-inside: avoid; }
-.it tbody tr:last-child { border-bottom: 1.3px solid #000; }
-.sum { font-size: ${is58 ? 9.5 : 10.5}px; margin-top: 4px; }
-.sum .ln { display: flex; justify-content: space-between; gap: 5px; margin: 2.5px 0; line-height: 1.3; }
-.sum .ln span:last-child { font-weight: 800; }
-.tot { display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #000; border-bottom: 2px solid #000; background: #fff; padding: 5px 2px; margin: 6px 0; }
-.tot .l { font-size: ${is58 ? 12 : 14}px; font-weight: 900; letter-spacing: 1.5px; }
-.tot .v { font-size: ${is58 ? 17 : 20}px; font-weight: 900; line-height: 1; }
-.words { font-size: ${is58 ? 8.5 : 9.5}px; font-weight: 800; text-align: center; margin: 3px 0 4px; line-height: 1.3; }
-.save { text-align: center; border: 1px dashed #000; padding: 4px 3px; font-size: ${is58 ? 9 : 10}px; font-weight: 900; margin: 5px 0; letter-spacing: .3px; }
-.pay { font-size: ${is58 ? 9.5 : 10.5}px; margin-top: 3px; }
-.pay .ln { display: flex; justify-content: space-between; gap: 5px; margin: 2.5px 0; line-height: 1.3; }
+.it tbody tr:last-child { border-bottom: 1.6px solid #000; }
+.sum { font-size: ${is58 ? 11 : 12.5}px; margin-top: 5px; }
+.sum .ln { display: flex; justify-content: space-between; gap: 5px; margin: 3px 0; line-height: 1.3; }
+.sum .ln span:last-child { font-weight: 900; }
+.tot { display: flex; justify-content: space-between; align-items: center; border-top: 2.5px solid #000; border-bottom: 2.5px solid #000; background: #fff; padding: 6px 2px; margin: 7px 0; }
+.tot .l { font-size: ${is58 ? 13 : 16}px; font-weight: 900; letter-spacing: 1.5px; }
+.tot .v { font-size: ${is58 ? 18 : 23}px; font-weight: 900; line-height: 1; }
+.words { font-size: ${is58 ? 10 : 11.5}px; font-weight: 900; text-align: center; margin: 4px 0 5px; line-height: 1.3; }
+.save { text-align: center; border: 1.5px dashed #000; padding: 5px 3px; font-size: ${is58 ? 10.5 : 12}px; font-weight: 900; margin: 6px 0; letter-spacing: .3px; }
+.pay { font-size: ${is58 ? 11 : 12.5}px; margin-top: 4px; }
+.pay .ln { display: flex; justify-content: space-between; gap: 5px; margin: 3px 0; line-height: 1.3; }
 .pay .ln b { font-weight: 900; }
-.pay .due { font-weight: 900; font-size: ${is58 ? 10.5 : 11.5}px; border-top: 1px solid #000; padding-top: 3px; margin-top: 4px; }
-.qr-wrap { text-align: center; margin: 6px 0 3px; }
-.qr-wrap img { width: ${is58 ? '25mm' : '29mm'}; height: ${is58 ? '25mm' : '29mm'}; object-fit: contain; display: block; margin: 0 auto; }
-.qr-txt { font-size: ${is58 ? 8.5 : 9.5}px; font-weight: 900; letter-spacing: .5px; margin-top: 3px; }
-.qr-url { font-size: ${is58 ? 8 : 9}px; font-weight: 700; margin-top: 1px; }
-.contact { font-size: ${is58 ? 8 : 9}px; font-weight: 800; text-align: center; margin-top: 3px; line-height: 1.35; word-break: break-word; }
-.thx { font-size: ${is58 ? 12 : 14}px; font-weight: 900; text-align: center; margin-top: 4px; line-height: 1.2; }
-.wish { font-size: ${is58 ? 8.5 : 9.5}px; font-weight: 700; text-align: center; margin-top: 2px; line-height: 1.3; }
-.eoe { font-size: ${is58 ? 7.5 : 8.5}px; font-weight: 700; text-align: center; margin-top: 4px; letter-spacing: 1px; }
+.pay .due { font-weight: 900; font-size: ${is58 ? 12 : 14}px; border-top: 1.5px solid #000; padding-top: 4px; margin-top: 5px; }
+.qr-wrap { text-align: center; margin: 7px 0 4px; }
+.qr-wrap img { width: ${is58 ? '27mm' : '32mm'}; height: ${is58 ? '27mm' : '32mm'}; object-fit: contain; display: block; margin: 0 auto; }
+.qr-txt { font-size: ${is58 ? 10 : 11.5}px; font-weight: 900; letter-spacing: .5px; margin-top: 3px; }
+.qr-url { font-size: ${is58 ? 9.5 : 11}px; font-weight: 800; margin-top: 1px; }
+.contact { font-size: ${is58 ? 9.5 : 11}px; font-weight: 900; text-align: center; margin-top: 3px; line-height: 1.35; word-break: break-word; }
+.thx { font-size: ${is58 ? 13 : 16}px; font-weight: 900; text-align: center; margin-top: 5px; line-height: 1.2; }
+.wish { font-size: ${is58 ? 10 : 11.5}px; font-weight: 800; text-align: center; margin-top: 3px; line-height: 1.3; }
 .sum, .tot, .words, .save, .pay, .qr-wrap { break-inside: avoid; page-break-inside: avoid; }
 @media print {
-    html, body {
-        width: ${PAGE_W_MM}mm;
-        margin: 0;
-        padding: 0;
-    }
+    html, body { width: ${PAGE_W_MM}mm; margin: 0; padding: 0; }
 }
 </style>
 </head>
@@ -1045,7 +1163,7 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 <div class="c">${logoTag}</div>
 <div class="c shop">${esc(SHOP.name)}</div>
 ${o.isEdit ? `<div class="c" style="font-weight:900;font-size:14px;letter-spacing:2px;border:2px solid #000;padding:2px;margin:2px 0;">*** EDITED BILL ***</div>` : ''}
-<div class="c tag">${esc(SHOP.tagline || 'Crackers & Fireworks')}</div>
+<div class="c tag">Crackers &amp; Fireworks</div>
 <div class="c addr">${esc(SHOP.address)}</div>
 <div class="c ph">Ph: ${esc(SHOP.phones)}</div>
 ${SHOP.gstin ? `<div class="c gst">GSTIN: ${esc(SHOP.gstin)}</div>` : ''}
@@ -1077,7 +1195,6 @@ ${SHOP.gstin ? `<div class="c gst">GSTIN: ${esc(SHOP.gstin)}</div>` : ''}
         <tr>
             <th class="it-sn-h">#</th>
             <th class="it-name-h">Product</th>
-            <th class="it-mrp-h">MRP</th>
             <th class="it-qty-h">Qty</th>
             <th class="it-rate-h">Rate</th>
             <th class="it-amt-h">Amt</th>
@@ -1088,8 +1205,9 @@ ${SHOP.gstin ? `<div class="c gst">GSTIN: ${esc(SHOP.gstin)}</div>` : ''}
 
 <div class="sol"></div>
 <div class="sum">
+    ${Number(t.offer || 0) > 0 ? `<div class="ln"><span>MRP Total</span><span>${N(t.mrp)}</span></div>
+    <div class="ln"><span>Offer Discount</span><span>- ${N(t.offer)}</span></div>` : ''}
     <div class="ln"><span>Sub Total</span><span>${N(t.sub)}</span></div>
-    ${Number(t.offer || 0) > 0 ? `<div class="ln"><span>Offer Discount</span><span>- ${N(t.offer)}</span></div>` : ''}
     ${Number(t.extra || 0) > 0 ? `<div class="ln"><span>Extra Discount</span><span>- ${N(t.extra)}</span></div>` : ''}
     ${Number(t.roundOff || 0) !== 0 ? `<div class="ln"><span>Round Off</span><span>${t.roundOff < 0 ? '- ' : '+ '}${N(Math.abs(Number(t.roundOff)))}</span></div>` : ''}
 </div>
@@ -1162,6 +1280,7 @@ ${qrImg ? `
             }, 120000);
         }
 
+        // ---------- global keyboard ----------
         document.addEventListener('keydown', e => {
             const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName);
             if (e.key === 'F2' || (e.key === '/' && !typing)) { e.preventDefault(); $('eItem').focus(); $('eItem').select(); }
@@ -1182,6 +1301,7 @@ ${qrImg ? `
             else if (e.key === 'Backspace' && !$('search').value && bill.length) { e.preventDefault(); const l = bill.pop(); toast('🗑️ Removed: ' + l.name, 'info'); renderCart(); }
         });
 
+        // ---------- entry bar (real billing flow) ----------
         let sel = null, sIdx = 0;
         const sugList = () => {
             const t = $('eItem').value.trim().toLowerCase();
@@ -1196,7 +1316,7 @@ ${qrImg ? `
             if (sIdx < 0) { sIdx = l.length - 1; }
             if (sIdx >= l.length) { sIdx = 0; }
             b.innerHTML = l.map((p, i) => {
-                const s0 = stockOf(p);
+                const s0 = availOf(p);
                 const used = bill.find(x => x.id === p.id)?.qty || 0;
                 const s = s0 === null ? null : s0 - used;
                 return `
@@ -1223,7 +1343,7 @@ ${qrImg ? `
         function entryAmt() { $('eAmt').textContent = inr((parseFloat($('eRate').value) || 0) * (parseInt($('eQty').value, 10) || 0)); entryInfo(); }
         function pick(p) {
             if (!p) return; if (isOut(p)) return toast('Out of stock: ' + p.name, 'error');
-            sel = p; $('eItem').value = p.name; $('eRate').value = p.price || 0; $('eQty').value = 1; const s = stockOf(p); $('eStock').textContent = s !== null ? s : 'In Stock';
+            sel = p; $('eItem').value = p.name; $('eRate').value = p.price || 0; $('eQty').value = 1; const s = availOf(p); $('eStock').textContent = s !== null ? s : 'In Stock';
             $('sugg').style.display = 'none'; entryAmt(); $('eQty').focus(); $('eQty').select();
         }
         function clearEntry() { sel = null; $('eItem').value = ''; $('eRate').value = ''; $('eQty').value = 1; $('eStock').textContent = '—'; $('eAmt').textContent = '₹0'; $('sugg').style.display = 'none'; entryInfo(); $('eItem').focus(); }
@@ -1231,7 +1351,7 @@ ${qrImg ? `
             if (!sel) return toast('Item select pannunga', 'error');
             const q = Math.floor(parseFloat($('eQty').value)), r = parseFloat($('eRate').value);
             if (!(q >= 1)) { toast('Qty enter pannunga', 'error'); $('eQty').focus(); return; }
-            const s = stockOf(sel), ex = bill.find(b => b.id === sel.id), tot = (ex ? ex.qty : 0) + q;
+            const s = availOf(sel), ex = bill.find(b => b.id === sel.id), tot = (ex ? ex.qty : 0) + q;
             if (s !== null && tot > s) { toast(`Only ${s} in stock: ${sel.name}`, 'error'); $('eQty').focus(); $('eQty').select(); return; }
             if (ex) ex.qty = tot; else bill.push({ id: sel.id, name: sel.name || 'Unnamed', price: isNaN(r) ? Number(sel.price) || 0 : r, oldPrice: Number(sel.oldPrice) || Number(sel.price) || 0, qty: q, included: true });
             renderCart(); clearEntry();
@@ -1270,6 +1390,7 @@ ${qrImg ? `
         $('eRate').addEventListener('focus', e => e.target.select()); $('eQty').addEventListener('focus', e => e.target.select());
         $('eAdd').onclick = addEntry;
 
+        // customer fields: Enter -> next field, last field Enter -> Save
         [['cName', 'cPhone'], ['cPhone', 'pay'], ['pay', 'dType'], ['dType', 'dVal'], ['dVal', 'recv']].forEach(([a, b]) =>
             $(a).addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $(b).focus(); $(b).select?.(); } }));
         $('recv').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); save(); } });
@@ -1282,18 +1403,24 @@ ${qrImg ? `
         }
         $('catBtn').onclick = () => toggleCat(); $('catX').onclick = () => toggleCat(false); $('catBack').onclick = () => toggleCat(false);
 
+        // ---------- ui ----------
         $('ham').onclick = () => { $('sidebar').classList.toggle('open'); $('overlay').classList.toggle('active'); };
         $('overlay').onclick = () => { $('sidebar').classList.remove('open'); $('overlay').classList.remove('active'); };
         $('logoutBtn').onclick = async () => { if (!confirm('Are you sure you want to logout?')) return; try { await signOut(auth); window.location.href = 'index.html'; } catch (e) { alert('Logout failed. Please try again.'); } };
 
+        // ---------- init ----------
         try { const d = JSON.parse(localStorage.getItem(K)); load(d || {}); } catch (e) { load({}); }
         renderHeld(); $('eItem').focus();
 
+        // ===== GLOBAL LOW-STOCK WATCHER =====
         (function () {
             const say = m => toast(m, 'error');
             let last = null, actx;
             const qtyOf = p => typeof p.stockQty === 'number' ? p.stockQty : null;
-            const statOf = p => { const q = qtyOf(p), t = p.lowStockThreshold || 5; return q === null ? 'un' : q <= 0 ? 'out' : q <= t ? 'low' : 'in'; };
+            const statOf = p => {
+                const q = qtyOf(p), t = p.lowStockThreshold || 5;
+                return q === null ? 'un' : q <= 0 ? 'out' : q <= t ? 'low' : 'in';
+            };
             function beep() {
                 try {
                     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
@@ -1305,6 +1432,7 @@ ${qrImg ? `
                 } catch (e) { }
             }
             document.addEventListener('pointerdown', () => { try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); } catch (e) { } }, { once: true });
+
             onSnapshot(collection(db, 'products'), snap => {
                 const cur = {}; let count = 0;
                 snap.docs.forEach(d => {
@@ -1324,6 +1452,6 @@ ${qrImg ? `
             });
         })();
     </script>
-</body>
+    </body>
 
 </html>

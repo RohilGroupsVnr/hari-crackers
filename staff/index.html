@@ -731,7 +731,7 @@
         ];
 
         // ✅ Staff home page
-        const STAFF_HOME = "./staff/billing.html";
+const STAFF_HOME = "../staff/billing.html";
         const loginScreen = document.getElementById("login-screen");
         const loginForm = document.getElementById("loginForm");
         const loginEmail = document.getElementById("loginEmail");
@@ -789,10 +789,10 @@
                         const email = (user.email || "").toLowerCase();
 
                         // ✅ Staff email check — admin illa
-                        if (staffEmails.includes(email)) {
-                            // Staff user — billing page-ku poagum
-window.location.href = "./billing.html";                            return;
-                        } else {
+                       if (staffEmails.includes(email)) {
+    window.location.replace(STAFF_HOME);
+    return;
+}else {
                             // Admin user — sign out, login screen thaan kaatanum
                             signOut(auth);
                             return;
